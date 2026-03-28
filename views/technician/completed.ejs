@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>งานที่สำเร็จแล้ว</title>
+  <link rel="stylesheet" href="/styles/index_technician.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <!-- เพิ่ม FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/technician/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/technician/dashboard"><i class="material-icons">home</i> หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'calendar' ? 'active' : '' %>">
+            <a href="/technician/calendar"><i class="material-icons">calendar_today</i> ตารางงาน</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/technician/bookings"><i class="material-icons">assignment</i> รายการงาน</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/completed"><i class="material-icons">check_circle</i> งานที่สำเร็จแล้ว</a>
+          </li>
+          <li class="<%= currentPage === 'profile' ? 'active' : '' %>">
+            <a href="/technician/profile"><i class="material-icons">account_circle</i> แก้ไขข้อมูล</a>
+        </li>
+          <li>
+            <a href="/technician/logout"><i class="material-icons">logout</i> ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="list-card">
+        <h1>งานที่สำเร็จแล้ว</h1>
+        <% const completedBookings = bookings.filter(b => b.status === 'completed'); %>
+
+        <% if (bookings.length === 0) { %>
+        <p>ยังไม่มีงานที่เสร็จสิ้น</p>
+        <% } else { %>
+        <table class="tech-table">
+            <thead>
+            <tr>
+                <th>ลำดับที่</th>
+                <th>บริการ</th>
+                <th>ชื่อผู้ใช้บริการ</th>
+                <th>วันที่</th>
+                <th>เวลา</th>
+                <th>ราคา</th>
+                <th>สถานะ</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% bookings.forEach(b => { %>
+                <tr>
+                <td><%= b.id %></td>
+                <td><%= b.service_name %></td>
+                <td><%= b.customer_name %></td>
+                <td>
+                  <script>
+                    document.write(
+                      new Date('<%= b.booking_date %>').toLocaleDateString('th-TH', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                      })
+                    );
+                  </script>
+                </td>
+                <td><%= b.booking_time.substring(0,5) %></td>
+                <td><%= !isNaN(Number(b.final_price)) ? Number(b.final_price).toFixed(2) + ' บาท' : '-' %></td>
+                <td class="booking-status booking-status-<%= b.status %>">
+                  <%= b.status_text %>
+                </td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+        <% } %>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

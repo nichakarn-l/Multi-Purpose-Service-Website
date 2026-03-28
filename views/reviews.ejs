@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รีวิวของฉัน</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+      <div class="navbar-right">
+        <div class="profile-dropdown">
+          <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+          <div class="dropdown-menu">
+            <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <div class="breadcrumb">
+      <a href="/">หน้าหลัก</a>
+      <i class="fas fa-angle-right"></i>
+      <a href="/reviews">รีวิวของฉัน</a>
+    </div>
+
+    <div class="profile-page">
+      <div class="profile-sidebar">
+        <h3>บัญชีของฉัน</h3>
+        <ul>
+          <li><a href="/edit-profile">ข้อมูลส่วนตัว</a></li>
+          <li><a href="/my-bookings">ประวัติการจอง</a></li>
+          <li><a href="/reviews" class="active">รีวิวของฉัน</a></li>
+        </ul>
+          <ul>
+            <li><a href="/logout" class="logout">ออกจากระบบ</a></li>
+        </ul>
+      </div>
+    <div class="mypayment-content">
+    <h1>รีวิวของฉัน</h1>
+    
+      <% if (reviews.length === 0) { %>
+        <p>ยังไม่มีรีวิว</p>
+      <% } else { %>
+        <% reviews.forEach(review => { %>
+          <div class="review-card">
+                <div class="review-header">
+                    
+                    <div>
+                    <h3>บริการ <%= review.service_name || '-' %></h3> 
+                    <strong><%= review.first_name %> <%= review.last_name %></strong><br>
+                    <span class="stars">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                        <% if (i <= review.rating) { %>
+                            <img src="/images/star-filled.png" alt="ดาวเต็ม" class="star-icon">
+                        <% } else { %>
+                            <img src="/images/star-empty.png" alt="ดาวว่าง" class="star-icon">
+                        <% } %>
+                        <% } %>
+                        <span class="rating-number"><%= review.rating %></span>
+                    </span>
+                    </div>
+                    <span class="review-date"><%= new Date(review.review_date).toLocaleDateString('th-TH') %></span>
+                </div>
+
+                <div class="review-content">
+                    <p><%= review.comment %></p>
+                </div>
+                </div>
+        <% }); %>
+      <% } %>
+    </div> 
+  </main>
+</body>
+</html>

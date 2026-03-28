@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>หน้าหลัก</title>
+  <link rel="stylesheet" href="/styles/index_technician.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+/>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/technician/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/technician/dashboard"><i class="material-icons">home</i> หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'calendar' ? 'active' : '' %>">
+            <a href="/technician/calendar"><i class="material-icons">calendar_today</i> ตารางงาน</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/technician/bookings"><i class="material-icons">assignment</i> รายการงาน</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/completed"><i class="material-icons">check_circle</i> งานที่สำเร็จแล้ว</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/profile"><i class="material-icons">account_circle</i> แก้ไขข้อมูล</a>
+          </li>
+          <li>
+            <a href="/technician/logout"><i class="material-icons">logout</i> ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+   
+    <main class="main-content">
+       <section class="stats">
+    <div class="stats-header">
+      <h2>ภาพรวมงาน</h2>
+      <p>สรุปจำนวนงานทั้งหมดของคุณ</p>
+    </div>
+    <div class="stats-cards">
+      <div class="card total">
+        <div class="icon-box">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <div class="info">
+          <p class="label">งานทั้งหมด</p>
+          <span class="value"><%= stats.total %></span>
+        </div>
+      </div>
+
+      <div class="card completed">
+        <div class="icon-box">
+          <i class="fa-solid fa-check-circle"></i>
+        </div>
+        <div class="info">
+          <p class="label">เสร็จแล้ว</p>
+          <span class="value"><%= stats.completed %></span>
+        </div>
+      </div>
+
+      <div class="card today">
+        <div class="icon-box">
+          <i class="fa-solid fa-calendar-day"></i>
+        </div>
+        <div class="info">
+          <p class="label">งานวันนี้</p>
+          <span class="value"><%= stats.today.length %></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔹 งานวันนี้ -->
+  <section class="today-jobs">
+    <div class="section-header">
+      <h2>งานที่ต้องทำวันนี้</h2>
+      <p>รายการงานประจำวันที่ได้รับมอบหมาย</p>
+    </div>
+
+    <% if (stats.today.length === 0) { %>
+      <div class="empty-box">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>ไม่มีงานในวันนี้</p>
+      </div>
+    <% } else { %>
+      <div class="jobs-list">
+        <% stats.today.forEach(job => { %>
+          <div class="job-card">
+            <div class="job-header">
+              <h3><i class="fa-solid fa-screwdriver-wrench"></i> <%= job.service_name || 'ไม่มีชื่อบริการ' %></h3>
+            </div>
+            <div class="job-detail">
+              <p><i class="fa-regular fa-clock"></i> เวลา: <%= job.booking_time ? job.booking_time.slice(0,5) : '-' %></p>
+              <% 
+                const statusMap = {
+                  deposit_paid: 'ชำระมัดจำแล้ว',
+                  scheduled: 'รอดำเนินการ',
+                  in_progress: 'กำลังให้บริการ',
+                  completed: 'ดำเนิดการเสร็จสิ้น',
+                  no_show: 'ช่างไม่พร้อมให้บริการตามนัด',
+                  need_reschedule: 'กรุณาเลือกวัน-เวลาใหม่ เนื่องจากช่างไม่พร้อมให้บริการ',
+                };
+              %>
+              <p>
+                <i class="fa-solid fa-circle-check"></i> 
+                สถานะ: 
+                <span class="booking-status booking-status-<%= job.status %>">
+                  <%= statusMap[job.status] || job.status %>
+                </span>
+              </p>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+    </main>
+  </div>
+</body>
+</html>

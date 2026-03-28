@@ -1,0 +1,134 @@
+/* login.css */
+body {
+  margin: 0;
+  font-family: 'Kanit', sans-serif;
+  background-color: #f4f4f4;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ฝั่งซ้าย (รูป) */
+.login-left {
+  flex: 1;
+  background: url('/images/bg_login.png') no-repeat center center;
+  background-size: cover;
+  opacity: 0.2;
+}
+
+/* ฝั่งขวา (แบบฟอร์ม) */
+.login-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #e9edf5;
+  padding: 40px;
+}
+
+.login-right h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+form {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+form input {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+
+form button {
+  padding: 12px;
+  background: #183C91;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+form button:hover {
+  background: #0d2c70;
+}
+
+.form-group-row {
+  display: flex;
+  gap: 17px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+form input.name-input {
+  width: 100%;
+}
+
+form input, form button {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.or-text {
+  margin: 20px 0 10px;
+  color: #444;
+  font-size: 14px;
+}
+
+.google-icon {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  margin: 8px 0;
+  transition: transform 0.2s ease;
+}
+
+.google-icon:hover {
+  transform: scale(1.1);
+}
+
+.register-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.register-text a {
+  color: #1F3C88;
+  text-decoration: none;
+}
+
+.register-text a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: left;
+}

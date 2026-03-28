@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title><%= service.name %> - รายละเอียดบริการ</title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-left">
+                <a href="/" class="logo">
+                    <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+                </a>
+            </div>
+            <div class="navbar-right">
+        <% if (user) { %>
+        <!-- ถ้า login แล้ว -->
+          <div class="profile-dropdown">
+            <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+            <div class="dropdown-menu">
+              <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+            </div>
+          </div>
+
+        <% } else { %>
+        <!-- ยังไม่ได้ login -->
+          <a href="/login" class="login-btn">เข้าสู่ระบบ</a>
+        <% } %>
+      </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/">หน้าหลัก</a>
+            <i class="fas fa-angle-right"></i>
+            <a href="/services/<%= categoryId %>"><%= categoryName %></a>
+            <i class="fas fa-angle-right"></i>
+            <a href="/service/<%= service.id %>"><%= service.name %></a>
+        </div>
+        
+        <div class="service-container">
+            <div class="service-image">
+                <img src="<%= service.image_path %>" alt="<%= service.name %>">
+            </div>
+
+            <div class="service-box">
+                <div class="service-right">
+                <h1><%= service.name %></h1>
+                
+                <p class="price-text"><%= Number(service.base_price).toLocaleString('th-TH') %> บาท/จุด</p>
+
+
+                <p class="s-deatail">รายละเอียดของบริการ<p>
+                <ul class="service-description">
+                <% service.description.split('\n').forEach(line => { %>
+                    <% if (line.trim()) { %>
+                    <li><%= line.trim().replace(/^•\s*/, '') %></li>
+                    <% } %>
+                <% }) %>
+                </ul>
+
+                <div class="btn-center">
+                    <% if (user) { %>
+                        <a href="/booking/<%= service.id %>" class="btn-book-s">จองบริการนี้</a>
+                    <% } else { %>
+                        <a href="/login" class="btn-book-s">จองบริการนี้</a>
+                    <% } %>
+                </div >
+                
+                </div>
+            </div>
+        </div>
+        
+
+    <!-- รีวิวจากลูกค้า -->
+        <section class="reviews">
+            <h2>รีวิวจากลูกค้า</h2>
+
+            <!--คะแนนเฉลี่ย!-->
+            <div class="review-summary">
+                <div class="summary-top">
+                    <div class="avg-rating">
+                    <h3><%= stats.avg_rating || 0 %> / 5</h3>
+                    <div class="stars">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                        <% if (i <= Math.floor(stats.avg_rating)) { %>
+                            <img src="/images/star-filled.png" alt="ดาวเต็ม" class="star-icon">
+                        <% } else { %>
+                            <img src="/images/star-empty.png" alt="ดาวว่าง" class="star-icon">
+                        <% } %>
+                        <% } %>
+                        (<%= stats.total_reviews %> รีวิว)
+                    </div>
+                    </div>
+
+                    <div class="rating-breakdown">
+                    <% const total = stats.total_reviews; %>
+                    <% for (let i = 5; i >= 1; i--) { %>
+                    <div class="breakdown-row">
+                        <div class="star-group">
+                            <% for (let j = 1; j <= 5; j++) { %>
+                            <% if (j <= i) { %>
+                                <img src="/images/star-filled.png" alt="ดาวเต็ม" class="star-icon">
+                            <% } else { %>
+                                <img src="/images/star-empty.png" alt="ดาวว่าง" class="star-icon">
+                            <% } %>
+                            <% } %>
+                        </div>
+
+                        <div class="bar-container">
+                            <% const count = stats['star' + i] || 0; %>
+                            <% const percent = total ? (count / total) * 100 : 0; %>
+                            <div class="bar" style="--bar-width: <%= percent %>%"></div>
+                        </div>
+
+                        <span class="count"><%= count %></span>
+                    </div>
+                    <% } %>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--รีวิวทั้งหมด!-->
+            <% if (reviews.length === 0) { %>
+                <p>ยังไม่มีรีวิวสำหรับบริการนี้</p>
+            <% } else { %>
+            <% reviews.forEach(review => { %>
+                <div class="review-card">
+                <div class="review-header">
+                    
+                    <div>
+                    <strong><%= review.first_name %> <%= review.last_name %></strong><br>
+                    <span class="stars">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                        <% if (i <= review.rating) { %>
+                            <img src="/images/star-filled.png" alt="ดาวเต็ม" class="star-icon">
+                        <% } else { %>
+                            <img src="/images/star-empty.png" alt="ดาวว่าง" class="star-icon">
+                        <% } %>
+                        <% } %>
+                        <span class="rating-number"><%= review.rating %></span>
+                    </span>
+                    </div>
+                    <span class="review-date"><%= new Date(review.review_date).toLocaleDateString('th-TH') %></span>
+                </div>
+
+                <div class="review-content">
+                    <p><%= review.comment %></p>
+                </div>
+                </div>
+            <% }) %>
+            <% } %>
+
+        </section>
+    </main>
+</body>
+</html>

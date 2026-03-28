@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>จัดการหมวดหมู่บริการ</title>
+  <link rel="stylesheet" href="/styles/index_admin.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+          <h1>จัดการหมวดหมู่บริการ</h1>
+          <button onclick="openAddModal()" class="btn-add">
+            <span class="material-icons">add</span>
+              เพิ่มหมวดหมู่
+            </button>
+
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>ลำดับที่</th>
+                <th>ชื่อหมวดหมู่</th>
+                <th>รูปภาพ</th>
+                <th>สถานะ</th>
+                <th>การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                  <tr>
+                    <td><%= category.id %></td>
+                    <td><%= category.name %></td>
+                    <td>
+                      <% if (category.image_path) { %>
+                        <img src="<%= category.image_path %>" alt="Category Image" style="height: 50px;">
+                      <% } else { %>
+                        ไม่มีรูป
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (category.is_active) { %>
+                          <span style="color: green;">เปิดใช้งาน</span>
+                      <% } else { %>
+                          <span style="color: red;">ปิดการใช้งาน</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <button class="btn-edit"onclick='openEditModal(<%= JSON.stringify(category) %>)'>แก้ไข</button>
+                        
+                        <% if (category.is_active) { %>
+                            <!-- แสดงเมื่อ Active -->
+                            <button class="btn-deactivate" onclick="deactivateCategory(<%= category.id %>)">
+                              ปิดการใช้งาน
+                            </button>
+                        <% } else { %>
+                            <!-- แสดงเมื่อ Inactive -->
+                            <button class="btn-restore" onclick="activateCategory(<%= category.id %>)">
+                              เปิดการใช้งาน
+                            </button>
+                        <% } %>
+
+
+                      </div>
+                      
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="4">ไม่พบหมวดหมู่บริการ</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal เพิ่มหมวดหมู่ -->
+    <div id="addModal" class="modal-list">
+      <div class="modal-list-content">
+        <span class="modal-list-close" onclick="closeAddModal()">&times;</span>
+        <h2>เพิ่มหมวดหมู่บริการ</h2>
+
+        <form action="/admin/service-categories/add" method="POST" enctype="multipart/form-data">
+          
+          <div class="image-upload-container">
+            <input type="file" id="add-image" name="image" accept="image/*" required hidden>
+            <label for="add-image" class="image-upload-box" id="imagePreview">
+              คลิกเพื่อเลือกรูป
+            </label>
+          </div>
+
+          <label for="add-name" class ="modal-list-label">ชื่อหมวดหมู่:</label>
+          <input type="text" id="add-name" name="name" placeholder="ชื่อหมวดหมู่" required>
+        
+          <div class="btn-row">
+              <button type="submit" class="btn-save">บันทึก</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+   <!-- Modal แก้ไขหมวดหมู่ -->
+    <div id="editModal" class="modal-list">
+      <div class="modal-list-content">
+        <span class="modal-list-close" onclick="closeEditModal()">&times;</span>
+        <h2>แก้ไขหมวดหมู่บริการ</h2>
+
+        <form id="editForm" method="POST" enctype="multipart/form-data">
+          <div class="image-upload-container">
+            <input type="file" id="edit-image" name="image" accept="image/*" required hidden>
+            <label for="edit-image" class="image-upload-box" id="editImagePreview">
+              คลิกเพื่อเลือกรูป
+            </label>
+          </div>
+
+          <input type="hidden" id="edit-id" name="id">
+          <label for="edit-name" class="modal-list-label">ชื่อหมวดหมู่:</label>
+          <input type="text" id="edit-name" name="name" required>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-save">บันทึก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <script>
+
+    // Modal เพิ่มหมวดหมู่
+    function openAddModal() {
+      document.getElementById("addModal").style.display = "block";
+    }
+    function closeAddModal() {
+      const addModal = document.getElementById("addModal");
+      addModal.style.display = "none";
+
+      // รีเซ็ต input และ preview
+      const addImage = document.getElementById('add-image');
+      const imagePreview = document.getElementById('imagePreview');
+
+      if (addImage) addImage.value = ''; // เคลียร์ไฟล์ที่เลือก
+      if (imagePreview) imagePreview.innerHTML = 'คลิกเพื่อเลือกรูป';
+    }
+
+    // Modal แก้ไขหมวดหมู่
+    function openEditModal(category) {
+      document.getElementById("edit-id").value = category.id;
+      document.getElementById("edit-name").value = category.name;
+
+      const editImagePreview = document.getElementById('editImagePreview');
+      if (category.image_path) {
+        editImagePreview.innerHTML = `<img src="${category.image_path}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+      } else {
+        editImagePreview.innerHTML = 'คลิกเพื่อเลือกรูป';
+      }
+
+      // ตั้ง action form ให้ส่งไป update route ที่เหมาะสม
+      document.getElementById("editForm").action = `/admin/service-categories/edit/${category.id}`;
+
+      document.getElementById("editModal").style.display = "block";
+    }
+    function closeEditModal() {
+      const editModal = document.getElementById("editModal");
+      editModal.style.display = "none";
+
+      // รีเซ็ต input + preview
+      if (editImage) editImage.value = '';
+      if (editImagePreview) editImagePreview.innerHTML = 'คลิกเพื่อเลือกรูป';
+    }
+
+
+    // ปิด modal ถ้าคลิกข้างนอก
+    window.onclick = function(event) {
+      const addModal = document.getElementById("addModal");
+      const editModal = document.getElementById("editModal");
+      if (event.target === addModal) {
+        closeAddModal(); // ใช้ฟังก์ชันเดียวกันเพื่อรีเซ็ต
+      }
+      if (event.target === editModal) {
+        closeEditModal();
+      }
+    }
+
+
+    // --- Preview รูปใน Add Modal ---
+const addImageInput = document.getElementById('add-image');
+const addImagePreview = document.getElementById('imagePreview');
+
+addImageInput.addEventListener('change', function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      addImagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+    }
+    reader.readAsDataURL(file);
+  } else {
+    addImagePreview.innerHTML = 'คลิกเพื่อเลือกรูป';
+  }
+});
+
+// --- Preview รูปใน Edit Modal ---
+const editImageInput = document.getElementById('edit-image');
+const editImagePreview = document.getElementById('editImagePreview');
+
+editImageInput.addEventListener('change', function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      editImagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+    }
+    reader.readAsDataURL(file);
+  } else {
+    editImagePreview.innerHTML = 'คลิกเพื่อเลือกรูป';
+  }
+});
+
+    //ปุ่มปิดการใช้งาน
+    async function deactivateCategory(id) {
+      if (!confirm("ต้องการปิดการใช้งานหรือไม่?")) return;
+
+      const res = await fetch(`/admin/service-categories/deactivate/${id}`, {
+        method: "POST"
+      });
+
+      if (res.ok) {
+        alert("ปิดการใช้งานสำเร็จ");
+        location.reload();
+      } else {
+        alert("เกิดข้อผิดพลาด");
+      }
+    }
+
+    //ปุ่มเปิดการใช้งาน
+    async function activateCategory(id) {
+      if (!confirm("ต้องการเปิดการใช้งานหรือไม่?")) return;
+
+      const res = await fetch(`/admin/service-categories/activate/${id}`, {
+        method: "POST"
+      });
+
+      if (res.ok) {
+        alert("เปิดการใช้งานสำเร็จ");
+        location.reload();
+      } else {
+        alert("เกิดข้อผิดพลาด");
+      }
+    }
+
+
+
+  </script>
+
+
+
+</body>
+</html>

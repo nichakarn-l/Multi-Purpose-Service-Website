@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>รายการงาน</title>
+  <link rel="stylesheet" href="/styles/index_technician.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <!-- FullCalendar (ถ้าต้องการใช้) -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+  
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/technician/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/technician/dashboard"><i class="material-icons">home</i> หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'calendar' ? 'active' : '' %>">
+            <a href="/technician/calendar"><i class="material-icons">calendar_today</i> ตารางงาน</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/technician/bookings"><i class="material-icons">assignment</i> รายการงาน</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/completed"><i class="material-icons">check_circle</i> งานที่สำเร็จแล้ว</a>
+          </li>
+          <li class="<%= currentPage === 'profile' ? 'active' : '' %>">
+            <a href="/technician/profile"><i class="material-icons">account_circle</i> แก้ไขข้อมูล</a>
+        </li>
+          <li>
+            <a href="/technician/logout"><i class="material-icons">logout</i> ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="list-card">
+        
+          <h1>งานวันนี้</h1>
+          <%
+            const today = new Date().toLocaleDateString('sv-SE');
+
+            const todaysBookings = bookings.filter(b => {
+              const jobDate = new Date(b.booking_date).toLocaleDateString('sv-SE');
+              return jobDate === today;
+            });
+
+            const otherBookings = bookings.filter(b => {
+              const jobDate = new Date(b.booking_date).toLocaleDateString('sv-SE');
+              return jobDate !== today;
+            });
+            %>
+
+
+          <% if (todaysBookings.length === 0) { %>
+            <p>ไม่มีงานสำหรับวันนี้</p>
+          <% } else { %>
+            <% todaysBookings.sort((a, b) => a.booking_time.localeCompare(b.booking_time)); %>
+            <table class="tech-table">
+              <thead>
+                <tr>
+                  <th>ลำดับที่</th>
+                  <th>บริการ</th>
+                  <th>ชื่อผู้ใช้บริการ</th>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ยอดชำระ</th>
+                  <th>สถานะ</th>
+                  <th>รายละเอียด</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% todaysBookings.forEach(b => { %>
+                  <tr>
+                    <td><%= b.id %></td>
+                    <td><%= b.service_name %></td>
+                    <td><%= b.customer_name %></td>
+                    <td>
+                      <script>
+                        document.write(
+                          new Date('<%= b.booking_date %>').toLocaleDateString('th-TH', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })
+                        );
+                      </script>
+                    </td>
+
+                    <td><%= b.booking_time.substring(0,5) %></td>
+                    <td><%= b.total_amount_fmt %></td>
+                    <td class="booking-status booking-status-<%= b.status %>">
+                      <%= b.status_text %>
+                    </td>
+                    <td>
+                      <button class="btn-detail" onclick="openModal(<%= b.id %>)">แสดง</button>
+                    </td>
+                    <td>
+                      <% if (b.status === 'scheduled') { %>
+                        <!-- ปุ่มเริ่มให้บริการ -->
+                        <form action="/technician/bookings/update" method="POST" style="display:inline;">
+                          <input type="hidden" name="booking_id" value="<%= b.id %>">
+                          <input type="hidden" name="new_status" value="in_progress">
+                          <button type="submit" class="btn-start"
+                            onclick="return confirm('เริ่มให้บริการงานนี้?')">
+                            เริ่มให้บริการ
+                          </button>
+                        </form>
+
+                      <% } else if (b.status === 'in_progress') { %>
+                        <!-- ปุ่มทำบริการเสร็จสิ้น -->
+                        <form action="/technician/bookings/update" method="POST" style="display:inline;">
+                          <input type="hidden" name="booking_id" value="<%= b.id %>">
+                          <input type="hidden" name="new_status" value="completed">
+                          <button type="submit" class="btn-complete"
+                            onclick="return confirm('เปลี่ยนสถานะเป็น เสร็จสิ้น?')">
+                            เสร็จสิ้น
+                          </button>
+                        </form>
+
+                      <% } else { %>
+                        -
+                      <% } %>
+                    </td>
+
+                  </tr>             
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+      </div>
+
+      
+      <div class="list-card">
+        <h1>งานทั้งหมด</h1>
+            <% if (otherBookings.length === 0) { %>
+              <p>ไม่มีงานอื่น ๆ</p>
+            <% } else { %>
+              <% otherBookings.sort((a, b) => {
+                const dateA = new Date(a.booking_date).getTime();
+                const dateB = new Date(b.booking_date).getTime();
+
+                if (dateA !== dateB) {
+                  return dateA - dateB;
+                } else {
+                  return a.booking_time.localeCompare(b.booking_time);
+                }
+              }); %>
+
+              <table class="tech-table">
+                <thead>
+                  <tr>
+                    <th>ลำดับที่</th>
+                    <th>บริการ</th>
+                    <th>ชื่อผู้ใช้บริการ</th>
+                    <th>วันที่</th>
+                    <th>เวลา</th>
+                    <th>สถานะ</th>
+                    <th>จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% otherBookings.forEach(b => { %>
+                    <tr>
+                      <td><%= b.id %></td>
+                      <td><%= b.service_name %></td>
+                      <td><%= b.customer_name %></td>
+                      <td>
+                        <script>
+                          document.write(
+                            new Date('<%= b.booking_date %>').toLocaleDateString('th-TH', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })
+                          );
+                        </script>
+                      </td>
+                      <td><%= b.booking_time.substring(0,5) %></td>
+                      
+                      <td class="booking-status booking-status-<%= b.status %>">
+                        <%= b.status_text %>
+                      </td>
+                      <td>
+                        <button class="btn-detail" onclick="openModal(<%= b.id %>)">แสดง</button>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            <% } %>
+        <!--  Modal Popup -->
+        <div id="bookingModal" class="modal" style="display:none;">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>รายละเอียดงาน</h3>
+
+            <p><strong>บริการ:</strong> <span id="modal-service"></span></p>
+            <p><strong>จำนวน:</strong> <span id="modal-point_count"></span></p>
+            <p><strong>วันนัดหมาย:</strong> <span id="modal-date"></span></p>
+            <p><strong>เวลานัดหมาย:</strong> <span id="modal-time"></span> น.</p>
+            <p><strong>ราคารวม:</strong> <span id="modal-total-price"></span> บาท</p>
+            <p><strong>มัดจำ:</strong> <span id="modal-deposit"></span> บาท</p>
+            <p><strong>ยอดคงเหลือ:</strong> <span id="modal-remaining"></span> บาท</p>
+            <p><strong>สถานะ:</strong> <span id="modal-status"></span></p>
+
+            <hr>
+            <h3>ข้อมูลผู้จอง</h3>
+            <p><strong>ชื่อผู้ใช้บริการ:</strong> <span id="modal-customer_name"></span></p>
+            <p><strong>เบอร์โทร:</strong> <span id="modal-phone"></span></p>
+            <p>
+              <strong>ที่อยู่:</strong> <span id="modal-address"></span>
+              <a id="modal-map-link" href="#" target="_blank" title="เปิดในแผนที่ (Google Maps)" class="map-icon-link" style="display:none;">
+                <img src="https://img.icons8.com/color/36/google-maps.png" alt="map icon">
+              </a>
+            </p>
+             
+          </div>
+        </div>
+      </div>
+  </main>
+  </div> 
+
+<script>
+  const bookingData = <%- JSON.stringify(bookings) %>;
+  let currentBookingId = null;
+
+  function formatAddress(b) {
+    let parts = [];
+    if (b.house_number) parts.push(b.house_number);
+    if (b.road) parts.push(b.road);
+    if (b.suburb) parts.push("แขวง" + b.suburb);
+    if (b.district) parts.push("เขต" + b.district);
+    if (b.city) parts.push(b.city);
+    if (b.postcode) parts.push(b.postcode);
+    return parts.join(" ") || "-";
+  }
+
+  // ฟังก์ชันช่วยแปลงวันที่
+  function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('th-TH', { 
+      year: 'numeric', month: 'long', day: 'numeric' 
+    });
+  }
+  function formatTime(timeStr) {
+  if (!timeStr) return '-';
+  
+  // ถ้ามาเป็น string เช่น "17:00:00"
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(timeStr)) {
+    return timeStr.substring(0,5); // เอาแค่ HH:mm
+  }
+
+  // ถ้ามาเป็น ISO string เช่น "2025-08-05T17:00:00.000Z"
+  const d = new Date(timeStr);
+  return d.toLocaleTimeString('th-TH', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+}
+
+  function openModal(bookingId) {
+    const booking = bookingData.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    currentBookingId = booking.id;
+
+    // ใส่ค่าลง modal
+    document.getElementById('modal-service').innerText = booking.service_name || '-';
+    document.getElementById('modal-point_count').innerText = booking.point_count ? booking.point_count + ' จุด' : '-';
+    document.getElementById('modal-date').innerText = formatDate(booking.booking_date);
+    document.getElementById('modal-time').innerText = formatTime(booking.booking_time);
+    document.getElementById("modal-total-price").textContent = booking.total_price_fmt;
+    document.getElementById("modal-deposit").textContent = booking.deposit_amount_fmt;
+    document.getElementById("modal-remaining").textContent = booking.total_amount_fmt;
+    document.getElementById('modal-status').innerText = booking.status_text || '-';
+
+    document.getElementById('modal-customer_name').innerText = booking.customer_name || '-';
+    document.getElementById('modal-phone').innerText = booking.phone || '-';
+    document.getElementById('modal-address').innerText = formatAddress(booking);
+    
+    // ถ้ามีพิกัด ให้ทำลิงก์เปิด Google Maps ได้
+    // ถ้ามีพิกัด ให้ทำลิงก์เปิด Google Maps ได้
+    if (booking.latitude && booking.longitude) {
+      const mapLink = `https://www.google.com/maps?q=${booking.latitude},${booking.longitude}`;
+      document.getElementById('modal-map-link').href = mapLink;
+      document.getElementById('modal-map-link').style.display = 'inline-block';
+    } else {
+      document.getElementById('modal-map-link').style.display = 'none';
+    }
+
+
+    document.getElementById('bookingModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+  }
+
+  // ปิด modal เมื่อคลิกนอกกล่อง
+  window.onclick = function(event) {
+    const modal = document.getElementById('bookingModal');
+    if (event.target === modal) {
+      closeModal();
+    }
+  }
+</script>
+
+
+</body>
+</html>

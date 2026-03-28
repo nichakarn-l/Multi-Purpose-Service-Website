@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>หน้าหลัก</title>
+  <link rel="stylesheet" href="/styles/index_admin.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+
+      <div class="content">
+        <!-- หัวข้อ Dashboard -->
+    <div class="dashboard-header">
+      <h1>แดชบอร์ดบริษัท HandyX</h1>
+      <p>สรุปข้อมูลภาพรวมของบริษัทประจำวัน</p>
+    </div>
+
+    <!-- กล่องสถิติ -->
+    <div class="stats">
+      <div class="card">
+        <div class="card-icon">
+          <i class="material-icons">build</i>
+        </div>
+        <div class="card-info">
+          <h3>จำนวนช่างทั้งหมด</h3>
+          <p><%= totalTechnicians %> คน</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">
+          <i class="material-icons">person</i>
+        </div>
+        <div class="card-info">
+          <h3>ผู้ใช้งานที่ลงทะเบียน</h3>
+          <p><%= totalUsers %> คน</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">
+          <i class="material-icons">receipt_long</i>
+        </div>
+        <div class="card-info">
+          <h3>คำสั่งชำระเงินทั้งหมด</h3>
+          <p><%= totalPayments %> รายการ</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- กราฟสรุป -->
+    <div class="chart-section">
+      <div class="chart-card">
+        <h2>ยอดการจองรายเดือน</h2>
+        <canvas id="bookingChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h2>รายได้การจองรายเดือน</h2>
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const bookingCtx = document.getElementById('bookingChart').getContext('2d');
+  const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+  // ดึงข้อมูลจริงจาก backend
+  const bookingsData = <%- JSON.stringify(bookingsChart) %>;
+  const revenueData = <%- JSON.stringify(revenueChart) %>;
+
+  const bookingLabels = bookingsData.map(b => b.month);
+  const bookingCounts = bookingsData.map(b => parseInt(b.count));
+
+  const revenueLabels = revenueData.map(r => r.month);
+  const revenueTotals = revenueData.map(r => parseFloat(r.total));
+
+  new Chart(bookingCtx, {
+    type: 'bar',
+    data: {
+      labels: bookingLabels,
+      datasets: [{
+        label: 'จำนวนการจอง',
+        data: bookingCounts,
+        backgroundColor: '#1F3C88',
+        borderRadius: 8,
+        barPercentage: 0.5,
+        categoryPercentage: 0.6
+      }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+
+  
+  new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+      labels: revenueLabels,
+      datasets: [{
+        label: 'รายได้การจองรายเดือน (บาท)',
+        data: revenueTotals,
+        borderColor: '#1F3C88',
+        backgroundColor: 'rgba(31,60,136,0.1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+</script>
+
+
+    </main>
+  </div>
+</body>
+</html>

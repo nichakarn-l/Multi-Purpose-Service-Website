@@ -1,0 +1,1176 @@
+/* Reset */
+body, h1, h2, p, ul {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
+
+body {
+  font-family: 'Kanit', sans-serif;
+  background-color: #f4f4f4;
+  color: #333333;
+  
+}
+.top-navbar {
+  height: 60px;
+  background-color: #2c2c2c; /* เทาเข้มแต่ไม่ดำ */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* Navbar left side (menu + logo) */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-icon {
+  font-size: 30px !important;
+  color: #FFF;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Navbar right side (profile icon) */
+.right-section i.material-icons {
+  font-size: 32px;
+  color: #FFF;
+  cursor: pointer;
+}
+
+/* Container below navbar */
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+  margin-top: 60px;
+  background: #f1f3f5;
+  overflow: auto;
+}
+
+/* Sidebar fixed */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: calc(100vh - 60px);
+  background-color: #2c2c2c;
+  color: #FFFFFF;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  padding: 24px 0;
+  border-right: 1px solid #3a3a3a;
+  overflow-y: auto;
+  z-index: 90;
+}
+
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  border-radius: 8px;
+  user-select: none;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: #888888;
+  transform: translateX(6px);
+  color: #ffffff;
+}
+
+.sidebar nav ul li.active a {
+  background-color: #444444;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: inset 4px 0 0 #fa9a32;
+}
+
+.sidebar nav ul li a i.material-icons {
+  font-size: 22px;
+  color: inherit;
+}
+
+
+/*login*/
+
+/* กึ่งกลางทั้งจอ */
+.login-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* กล่องฟอร์ม */
+.login-box {
+  background: none;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* ฟอร์มแถวเดียว */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input {
+  width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  background-color: white;
+}
+
+/* ปุ่ม */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #1F3C88;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px; 
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #1a2f6c;
+}
+
+/*จบlogin*/
+
+
+
+/* Main Content */
+.main-content {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  min-height: 100vh;
+  background-color: #F5F6FA;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  height: 60px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.admin-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1F2937;
+  font-family: 'Kanit', sans-serif;
+}
+
+/* ส่วนเนื้อหา */
+.content {
+  padding: 30px;
+}
+
+/* ===== Dashboard Header ===== */
+.dashboard-header {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.dashboard-header h1 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 1.8rem;
+  color: #1F3C88;
+  margin-bottom: 5px;
+}
+
+.dashboard-header p {
+  font-family: 'Kanit', sans-serif;
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+/* ===== Chart Section ===== */
+.chart-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  min-height: 300px;
+}
+
+.chart-card h2 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 1.2rem;
+  color: #1F3C88;
+  margin-bottom: 12px;
+}
+
+.chart-card canvas {
+  width: 100%;
+  height: 250px;
+}
+
+
+/* ===== ปรับกล่อง Stats ให้เป็นบริษัทมากขึ้น ===== */
+.card {
+  background: linear-gradient(145deg, #ffffff, #f2f5fb);
+  border-radius: 16px;
+  box-shadow: 0 6px 15px rgba(31, 60, 136, 0.08);
+  padding: 20px 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(31, 60, 136, 0.15);
+}
+
+.card-icon {
+  background-color: #1F3C88;
+  color: #fff;
+  padding: 18px;
+  border-radius: 50%;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-info h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #1F2937;
+  font-family: 'Kanit', sans-serif;
+}
+
+.card-info p {
+  margin-top: 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1F3C88;
+  font-family: 'Kanit', sans-serif;
+}
+
+
+
+/*icon + หน้า list */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #1F3C88;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: 'Kanit', sans-serif;
+  transition: background-color 0.2s ease;
+}
+
+.btn-add:hover {
+  background-color: #324d9c;
+}
+
+/*ตาราง*/
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  table-layout: fixed;
+  text-align: center;
+}
+
+.tech-table th, 
+.tech-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.tech-table thead {
+  background-color: #3a3a3a;
+  color: #fff;
+}
+
+.tech-table tbody tr:hover {
+  background-color: #F9FAFB;
+}
+
+.tech-table td:last-child {
+  white-space: nowrap;
+}
+
+
+
+/* จำกัดคอลัมน์จัดการ */
+table th:last-child,
+table td:last-child {
+  width: 150px;
+  text-align: center;
+}
+
+/* ปุ่มจัดการ */
+/* กล่องครอบปุ่ม */
+.btn-group {
+  display: flex;
+  gap: 8px; /* ✅ ระยะห่างระหว่างปุ่ม */
+}
+.btn-edit,
+.btn-delete,
+.btn-deactivate,
+.btn-restore {
+  display: inline-block;
+  width: 80px;              /* ✅ ให้ขนาดเท่ากัน */
+  text-align: center;       /* จัดข้อความกลาง */
+  padding: 6px 0;           /* ให้ความสูงพอดี */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;    /* เอาเส้นใต้ลิงก์ออก */
+}
+
+/* ปุ่มแก้ไข */
+.btn-edit {
+  background-color: #facc15;
+}
+
+.btn-edit:hover {
+  background-color: #eab308;
+}
+
+/* ปุ่มลบ */
+.btn-delete {
+  background-color: #ef4444;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+/* ปุ่มปิดการใช้งาน*/
+.btn-deactivate {
+  background-color: #ef4444;
+  width: 110px;
+}
+
+.btn-deactivate:hover {
+  background-color: #c82333;
+}
+
+/* ปุ่มเปิดการใช้งาน*/
+.btn-restore  {
+  background-color: #28a745;
+  width: 130px;
+}
+
+.btn-restore :hover {
+  background-color: #218838;
+}
+
+
+
+/*หน้า add ช่าง*/
+.form-technician {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Kanit', sans-serif;
+}
+
+.form-technician h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #1F3C88;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 16px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+
+.service-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  background-color: #f1f5f9;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.service-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eef5ff;
+  border: 1px solid #c7defc;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.service-item:hover {
+  background-color: #d7e9ff;
+}
+
+.service-item input[type="checkbox"] {
+  accent-color: #007bff;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+
+/* ปุ่มย้อนกลับ */
+/* สไตล์ร่วม */
+.btn-back,
+.btn-submit {
+  width: 160px; /* 👈 กำหนดความกว้างตายตัว */
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  border: none;
+  box-sizing: border-box;
+}
+
+/* ปุ่มย้อนกลับ */
+.btn-back {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.btn-back:hover {
+  background-color: #d1d5db;
+}
+
+/* ปุ่มบันทึก */
+.btn-submit {
+  background-color: #1F3C88;
+  color: white;
+}
+
+.btn-submit:hover {
+  background-color: #162c5f;
+}
+
+/*pop up หน้า SC - list*/
+.modal-list {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-list-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  
+}
+
+.modal-list-close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* หัวข้อ */
+.modal-list-content h2 {
+  text-align: center;
+  font-size: 20px;
+  color: #222;
+  margin-bottom: 24px;
+}
+
+/* label */
+.modal-list-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #000000;
+}
+
+/* input */
+.modal-list-content input,
+.modal-list-content select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+.modal-list-content input:focus,
+.modal-list-content select:focus {
+  outline: none;
+  border-color: #1F3C88;
+}
+
+/*เลือกรูปหมวดหมู่*/
+.image-upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.image-upload-box {
+  display: flex;
+  align-items: center;       /* แนวตั้งกลาง */
+  justify-content: center;   /* แนวนอนกลาง */
+  width: 100%;
+  height: 200px;
+  background-color: #f3f3f3;
+  color: #555;
+  border: 2px solid #f3f3f3;
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  
+  /* ลบ padding และ line-height เพื่อให้ flex ทำงานเต็มที่ */
+  padding: 0;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.image-upload-box:hover {
+  border-color: #1F3C88;
+}
+
+.image-upload-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* แถวปุ่มล่าง */
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* ปุ่มบันทึก */
+.btn-save {
+  background-color: #1F3C88;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #1a2f6c;
+}
+
+
+/*หน้า payment*/
+/* ปุ่มยืนยัน (confirm) สีเขียว */
+button.confirm-btn {
+  background-color: #28a745; /* เขียวสด */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  margin-right: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+button.confirm-btn:hover {
+  background-color: #218838; /* เขียวเข้มเวลา hover */
+}
+
+/* ปุ่มปฏิเสธ (reject) สีแดง */
+button.reject-btn {
+  background-color: #dc3545; /* แดงสด */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+button.reject-btn:hover {
+  background-color: #c82333; /* แดงเข้มเวลา hover */
+}
+
+button.confirm-btn i.material-icons,
+button.reject-btn i.material-icons {
+  vertical-align: middle;
+  margin-right: 4px;
+  font-size: 18px;
+}
+
+/* thumbnail */
+.slip-thumbnail {
+  width: 120px;
+  height: auto;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.slip-thumbnail:hover {
+  transform: scale(1.08);
+}
+
+/* พื้นหลังมืด */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+/* กล่องขาว */
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  max-width: 450px; /* จาก 600 ลดเหลือ 450 */
+  width: 85%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  animation: fadeIn 0.2s ease;
+  text-align: center;
+}
+
+/* รูปข้างในเล็กลงหน่อย */
+.modal-img {
+  width: 100%;
+  max-height: 400px; /* จำกัดความสูงไม่ให้เต็มจอ */
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+/* ปุ่มปิด */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+/*addช่าง*/
+.technician-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Kanit', sans-serif;
+  color: #333;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* กล่องรูปโปรไฟล์ วงกลม*/
+.technician-form-photo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.technician-form-photo-box {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background-color: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  color: #999;
+  border: 2px solid #f3f3f3;
+  transition: border-color 0.3s;
+}
+
+.technician-form-photo-box:hover {
+  border-color: #1F3C88;
+}
+
+/*กล่องหน้า service*/
+.technician-form-photo-box_service {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px; 
+  background-color: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  color: #999;
+  border: 2px solid #f3f3f3;
+  transition: border-color 0.3s;
+}
+
+/* เพิ่มเอฟเฟกต์ hover ให้นุ่มขึ้น */
+.technician-form-photo-box_service:hover {
+  border-color: #1F3C88;
+}
+
+/* แถวของช่องข้อมูล */
+.technician-form-fields {
+  max-width: 900px;       
+  margin: 0 auto;         
+  padding: 30px 40px;
+}
+
+.technician-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 170px;
+  margin-bottom: 20px;
+}
+
+.technician-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.technician-form-group label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.technician-form-group input,
+.technician-form-group select {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.technician-form-group input:focus,
+.technician-form-group select:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+
+.technician-form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  min-height: 70px; /* ความสูงเริ่มต้น */
+  resize: vertical;  /* ให้ขยายเฉพาะแนวตั้งได้ */
+  transition: border-color 0.3s;
+}
+
+.technician-form-group textarea:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+#base_price {
+  width: 120px;
+}
+
+#hours,
+#minutes {
+  width: 75px;
+  vertical-align: middle;
+}
+
+#duration-group div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#option-group{
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+#option-group input[type="text"],
+#option-group input[type="number"] {
+  width: 170px;
+}
+
+/* ให้ dropdown คำนำหน้าแคบลง */
+.technician-form-group select[name="prefix"] {
+  max-width: 165px;
+}
+
+.technician-form-group select[name="category_id"] {
+  max-width: 290px;
+}
+
+.technician-form-group select[name="service_category_id"] {
+  max-width: 165px;
+}
+
+.technician-form-fields h3 {
+  border-left: 4px solid #1F3C88;
+  padding-left: 8px;
+  color: #333;
+  font-size: 18px;
+  margin-top: 30px;
+}
+
+.service-grid {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 0;
+  width: fit-content;
+}
+
+/* ซ่อน checkbox เดิม */
+.service-option input[type="checkbox"] {
+  display: none;
+}
+
+/* label แต่ละรายการ */
+.service-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;      /* ระยะระหว่างวงกลมกับข้อความ */
+  font-size: 14px; /* ลดขนาดข้อความเล็กลง */
+  color: #000;
+}
+
+/* สี่เหลี่ยม */
+.service-option span::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border: 2px solid #1f3c88; 
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  margin-right: 6px;
+  border-radius: 0;   /* ทำให้เป็นสี่เหลี่ยม */
+}
+
+/* เมื่อเลือกแล้ว */
+.service-option input[type="checkbox"]:checked + span::before {
+  background-color: #1f3c88; /* สีพื้นหลังตอนเลือก */
+  content: "✔";              /* ติ๊กถูก */
+  color: #fff;               /* สีติ๊ก */
+  font-size: 12px;
+  text-align: center;
+  line-height: 16px;         /* ให้ ✔ อยู่กลางกล่อง */
+}
+
+/* ข้อความให้อยู่กลางกับวงกลม */
+.service-option span {
+  display: flex;
+  align-items: center;
+  height: 16px; /* เท่ากับวงกลม */
+}
+
+.technician-btn-group {
+  display: flex;
+  justify-content: flex-end; /* ✅ ดันปุ่มไปทางขวา */
+  padding-right: 1px;       /* ✅ เพิ่มระยะจากขอบขวาเล็กน้อย (ปรับได้) */
+}
+
+.submit-right {
+  display: block;        /* ทำให้ปุ่มแยกบรรทัดจากองค์ประกอบอื่น */
+  margin-left: auto;    /* ดันให้ปุ่มไปชิดขวา */
+  margin-right: 200px;
+}
+
+.technician-btn-submit,
+.technician-btn-back {
+  background-color: #1F3C88; /* สีพื้นฐาน (เปลี่ยนได้ตามปุ่ม) */
+  color: white;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ขนาดปุ่มเท่ากัน */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* กำหนดความกว้างขั้นต่ำให้เท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.technician-btn-submit {
+  background-color: #1F3C88;
+  color: white;
+}
+.technician-btn-submit:hover {
+  background-color: #1a2f6c; /* ฟ้าน้ำเงินเข้มขึ้น */
+}
+
+
+.technician-btn-back {
+  background-color: #ccc;
+}
+.technician-btn-back:hover {
+  background-color: #999; /* เทาเข้มขึ้น */
+}
+
+
+/*กล่องหน้า list และอื่นๆ*/
+.list-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.list-card h1 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.list-card p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.booking-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.booking-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+  color: #aaa;
+  float: right;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-show {
+  background-color: #1F3C88;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.btn-show:hover {
+  background-color: #162c5e;
+}
+
+
+.btn-back-home {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+  text-decoration: none;
+}
+
+.btn-back-home span {
+  color: #1F3C88; /* สีฟ้าแบบในภาพ */
+  transition: color 0.2s;
+}
+
+.btn-back-home span:hover {
+  color: #0a5adf; /* ฟ้าเข้มขึ้นเวลา hover */
+}
+
+
+/* UI  */
+/* Pending */
+.booking-status-awaiting_deposit{
+  color:#f59e0b;
+}
+
+/* Paid / Scheduled */
+.booking-status-deposit_paid,
+.booking-status-scheduled{
+  color:#2563eb;
+}
+
+/* Processing */
+.booking-status-in_progress{
+  color:#4f46e5;
+}
+
+/* Success */
+.booking-status-completed{
+  color:#16a34a;
+}
+
+/* Cancel */
+.booking-status-cancelled_by_user,
+.booking-status-cancelled_by_system{
+  color:#dc2626;
+}
+
+/* Neutral */
+.booking-status-no_show{
+  color:#6b7280;
+}
+
+/* Warning */
+.booking-status-need_reschedule{
+  color:#ea580c;
+}

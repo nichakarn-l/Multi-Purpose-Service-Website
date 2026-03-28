@@ -1,0 +1,934 @@
+/* Reset & base */
+body {
+  margin: 0;
+  font-family: 'Kanit', sans-serif;
+  background-color: #F5F6FA;
+  overflow: auto; 
+}
+
+/* Top Navbar */
+.top-navbar {
+  height: 60px;
+  background-color: #1b263b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* Navbar left side (menu + logo) */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-icon {
+  font-size: 30px !important;
+  color: white;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Navbar right side (profile icon) */
+.right-section i.material-icons {
+  font-size: 32px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Container below navbar */
+.container {
+  display: flex;
+  height: calc(100vh - 60px); /* เต็มหน้าจอ ลบ navbar */
+  margin-top: 60px; /* เว้นบาร์บน */
+  
+  overflow: auto;
+}
+
+/* Sidebar fixed */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: calc(100vh - 60px); /* เต็มความสูง ยกเว้น navbar */
+  background-color: #1b263b;
+  color: #e0e6f0;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  padding: 24px 0;
+  box-shadow: 2px 0 8px rgba(27, 38, 59, 0.8);
+  border-right: 1px solid #324a74;
+  overflow-y: auto;
+  z-index: 90;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav ul li {
+  margin: 8px 0;
+}
+
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  text-decoration: none;
+  color: #e0e6f0;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  border-radius: 8px;
+  user-select: none;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: #324a74;
+  transform: translateX(6px);
+  color: #fff;
+}
+
+.sidebar nav ul li.active a {
+  background-color: #f1c40f;
+  font-weight: 700;
+  color: #1b263b;
+  box-shadow: inset 4px 0 0 #f39c12;
+}
+
+.sidebar nav ul li a i.material-icons {
+  font-size: 22px;
+  color: inherit;
+}
+
+
+
+
+/* Main content - เว้น margin ซ้ายเท่ากับ sidebar */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 30px;
+  background-color: #F5F6FA;
+  height: 100%;
+}
+
+/* Header ใน main content */
+.main-content > header p {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 0 20px 0;
+}
+/* 🔹 Section Header */
+.stats-header, .section-header {
+  margin-bottom: 20px;
+}
+.stats-header h2, .section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1F3C88;
+}
+.stats-header p, .section-header p {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* 🔹 Cards Summary */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-left: 5px solid transparent;
+  transition: 0.3s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+/* Icon boxes */
+.icon-box {
+  background-color: #e8edfa;
+  border-radius: 10px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-box i {
+  font-size: 1.4rem;
+  color: #1F3C88;
+}
+
+/* Card text */
+.info .label {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+.info .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1F3C88;
+}
+
+/* Card accent colors */
+.card.total { border-left-color: #1F3C88; }
+.card.completed { border-left-color: #4caf50; }
+.card.today { border-left-color: #f59e0b; }
+
+/* 🔹 Job List */
+.today-jobs {
+  margin-top: 40px;
+}
+.jobs-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.job-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  transition: 0.3s;
+}
+.job-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.08);
+}
+.job-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1F3C88;
+  margin-bottom: 10px;
+}
+.job-card p {
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.job-card i {
+  color: #1F3C88;
+  margin-right: 8px;
+}
+
+/* Empty box (no jobs today) */
+.empty-box {
+  text-align: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  color: #6b7280;
+}
+.empty-box i {
+  font-size: 2rem;
+  color: #1F3C88;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-cards {
+    flex-direction: column;
+  }
+}
+
+.today-jobs ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+/* ตารางรายการงาน (ถ้ามี) */
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.job-table th, .job-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.job-table th {
+  background-color: #f3f3f3;
+  color: #374151;
+}
+
+.job-table tr:hover {
+  background-color: #f0f8ff;
+}
+
+
+/*login*/
+.center-login {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  width: 400px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 30px 40px;
+  box-sizing: border-box;
+}
+
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background-color: #1F3C88;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Kanit', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-login:hover {
+  background-color: #324d9c;
+}
+
+/*ตาราง*/
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  color: #1b263b; /* สีตัวอักษร */
+}
+
+.tech-table thead {
+  background-color: #e6ecf5; /* สีหัวตารางแนวฟ้าอ่อน */
+  color: #1b263b;
+}
+
+.tech-table th, .tech-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e6f0; /* สีเส้นแบ่งแนวอ่อน */
+}
+
+.tech-table tbody tr:hover {
+  background-color: #f0f4f9; /* สี hover ฟ้าอ่อน */
+}
+
+.tech-table td:last-child {
+  white-space: nowrap;
+}
+
+/*ปุ่มหน้า bookins*/
+button.btn-start,
+button.btn-complete,
+button.btn-reschedule {
+  background-color: #1F3C88; /* สีพื้นฐาน (เปลี่ยนได้ตามปุ่ม) */
+  color: white;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ขนาดปุ่มเท่ากัน */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* กำหนดความกว้างขั้นต่ำให้เท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+/* ปรับสีแยกปุ่ม */
+button.btn-start {
+  background-color: #1F3C88;
+}
+
+button.btn-start:hover {
+  background-color: #16306a;
+}
+
+button.btn-complete {
+  background-color: #28a745;
+}
+
+button.btn-complete:hover {
+  background-color: #1e7e34;
+}
+button.btn-reschedule {
+  background-color: #ff3f3f;
+}
+
+button.btn-reschedule {
+  background-color: #e96a4d;
+}
+
+/* ปุ่มดูรายละเอียด */
+button.btn-detail {
+  background-color: #f1c40f;  /* สีเหลือง */
+  font-family: 'Kanit', sans-serif;
+  color: #1b263b;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+button.btn-detail:hover {
+  background-color: #f39c12;
+}
+
+
+/*popup หน้า booking*/
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.modal .close {
+  position: absolute;
+  top: 10px; right: 16px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/*ปฏิทิน*/
+#calendar {
+  min-height: 600px; /* กำหนดความสูงขั้นต่ำ */
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/*กล่องหน้า list และอื่นๆ*/
+.list-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.list-card h1 {
+  font-family: 'Kanit', sans-serif;
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.list-card p {
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.booking-modal {
+  display: none; /* ซ่อนตอนเริ่มต้น */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.booking-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.booking-close {
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+  color: #333;
+}
+
+.booking-close:hover {
+  color: #000;
+}
+
+/* ===== ปุ่ม "เปิดแผนที่" ===== */
+/* ปุ่มแผนที่ */
+.map-icon-link {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.map-icon-link img {
+  vertical-align: middle;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  height: 32px; /* ปรับให้พอดีกับขนาดตัวหนังสือ */
+}
+
+.map-icon-link img:hover {
+  transform: scale(1.1);
+}
+
+
+/*addช่าง*/
+.technician-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Kanit', sans-serif;
+  color: #333;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* กล่องรูปโปรไฟล์ วงกลม*/
+.technician-form-photo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.technician-form-photo-box {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background-color: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  color: #999;
+  border: 2px solid #f3f3f3;
+  transition: border-color 0.3s;
+}
+
+.technician-form-photo-box:hover {
+  border-color: #1F3C88;
+}
+
+/*กล่องหน้า service*/
+.technician-form-photo-box_service {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px; 
+  background-color: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  color: #999;
+  border: 2px solid #f3f3f3;
+  transition: border-color 0.3s;
+}
+
+/* เพิ่มเอฟเฟกต์ hover ให้นุ่มขึ้น */
+.technician-form-photo-box_service:hover {
+  border-color: #1F3C88;
+}
+
+/* แถวของช่องข้อมูล */
+.technician-form-fields {
+  max-width: 900px;       
+  margin: 0 auto;         
+  padding: 30px 40px;
+}
+
+.technician-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 170px;
+  margin-bottom: 20px;
+}
+
+.technician-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.technician-form-group label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.technician-form-group input,
+.technician-form-group select,
+.technician-form-group .flatpickr-input,
+.technician-form-group input[type="text"][readonly] {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.technician-form-group input:focus,
+.technician-form-group select:focus,
+.technician-form-group .flatpickr-input:focus,
+.technician-form-group input[type="text"][readonly]:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+
+#birth_date {
+  width: 31%;       /* ปรับความกว้างตามต้องการ */
+  
+}
+
+
+.technician-form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  min-height: 70px; /* ความสูงเริ่มต้น */
+  resize: vertical;  /* ให้ขยายเฉพาะแนวตั้งได้ */
+  transition: border-color 0.3s;
+}
+
+.technician-form-group textarea:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+
+/* ให้ dropdown คำนำหน้าแคบลง */
+.technician-form-group select[name="prefix"] {
+  max-width: 165px;
+}
+
+.technician-form-group select[name="category_id"] {
+  max-width: 290px;
+}
+
+.technician-form-group select[name="service_category_id"] {
+  max-width: 165px;
+}
+
+
+
+
+.technician-form-fields h3 {
+  border-left: 4px solid #1F3C88;
+  padding-left: 8px;
+  color: #333;
+  font-size: 18px;
+  margin-top: 30px;
+}
+
+.technician-btn-submit,
+.technician-btn-back {
+  background-color: #1F3C88; /* สีพื้นฐาน (เปลี่ยนได้ตามปุ่ม) */
+  color: white;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ขนาดปุ่มเท่ากัน */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* กำหนดความกว้างขั้นต่ำให้เท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+
+}
+
+.technician-btn-submit {
+  background-color: #1F3C88;
+  color: white;
+}
+.technician-btn-submit:hover {
+  background-color: #1a2f6c; /* ฟ้าน้ำเงินเข้มขึ้น */
+}
+.submit-right {
+  display: block;        /* ทำให้ปุ่มแยกบรรทัดจากองค์ประกอบอื่น */
+  margin-left: auto;    /* ดันให้ปุ่มไปชิดขวา */
+  margin-right: 300px;
+}
+
+.birth-input {
+  width: 170px;   /* กำหนดความกว้างตามต้องการ */
+}
+
+.btn-back-home {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+  text-decoration: none;
+}
+
+.btn-back-home span {
+  color: #1F3C88; /* สีฟ้าแบบในภาพ */
+  transition: color 0.2s;
+}
+
+.btn-back-home span:hover {
+  color: #0a5adf; /* ฟ้าเข้มขึ้นเวลา hover */
+}
+
+
+.reschedule-textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  width: 95%;
+  min-height: 70px;
+  resize: vertical;
+  transition: border-color 0.3s;
+}
+
+.reschedule-textarea:focus {
+  border-color: #1F3C88;
+  outline: none;
+}
+
+.btn-warning {
+  background-color: #f31212; /* สีพื้นฐาน */
+  color: white;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ✅ ขนาดพอดีเหมือนปุ่ม technician */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* ✅ ความกว้างขั้นต่ำเท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.btn-warning:hover {
+  background-color: #e7423d;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+
+.btn-submitwr {
+  background: #183C91;
+  color: #fff;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ✅ ขนาดพอดีเหมือนปุ่ม technician */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* ✅ ความกว้างขั้นต่ำเท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.btn-submitwr:hover {
+  background: #0d2c70;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: #fff;
+  font-family: 'Kanit', sans-serif;
+  border: none;
+  padding: 8px 20px;      /* ✅ ขนาดพอดีเหมือนปุ่ม technician */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;       /* ✅ ความกว้างขั้นต่ำเท่ากัน */
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+
+.reschedule-limit-box {
+  margin: 20px auto;
+  padding: 12px;
+  background: #e7f3fe;
+  color: #084298;
+  border: 1px solid #b6d4fe;
+  text-align: center;
+  border-radius: 6px;
+  max-width: 90%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.reschedule-note,
+.reschedule-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;              /* ระยะห่าง icon กับ text */
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.reschedule-note {
+  color: #b91c1c;
+}
+
+.reschedule-info {
+  color: #084298;
+}
+
+/* UI  */
+/* Pending */
+.booking-status-awaiting_deposit{
+  color:#f59e0b;
+}
+
+/* Paid / Scheduled */
+.booking-status-deposit_paid,
+.booking-status-scheduled{
+  color:#2563eb;
+}
+
+/* Processing */
+.booking-status-in_progress{
+  color:#4f46e5;
+}
+
+/* Success */
+.booking-status-completed{
+  color:#16a34a;
+}
+
+/* Cancel */
+.booking-status-cancelled_by_user,
+.booking-status-cancelled_by_system{
+  color:#dc2626;
+}
+
+/* Neutral */
+.booking-status-no_show{
+  color:#6b7280;
+}
+
+/* Warning */
+.booking-status-need_reschedule{
+  color:#ea580c;
+}

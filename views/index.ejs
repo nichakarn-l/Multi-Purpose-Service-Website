@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>บริการสารพัดช่าง</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+
+<body >
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+
+      <div class="navbar-center">
+        <form action="/service" method="GET">
+          <input 
+            type="text" 
+            name="search" 
+            placeholder="ค้นหางานช่างที่ต้องการ..." 
+            class="search-bar"
+          >
+        </form>
+      </div>
+
+
+
+
+      <div class="navbar-right">
+        <% if (user) { %>
+        <!-- ถ้า login แล้ว -->
+          <div class="profile-dropdown">
+            <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+            <div class="dropdown-menu">
+              <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+            </div>
+          </div>
+
+        <% } else { %>
+        <!-- ยังไม่ได้ login -->
+          <a href="/login" class="login-btn">เข้าสู่ระบบ</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- แถบโฆษณา -->
+  <div class="slider">
+    <div class="slides">
+      <div class="slide">
+        <img src="/images/01.png" alt="โปรโมชัน 1">
+      </div>
+      <div class="slide">
+        <img src="/images/02.png" alt="โปรล้างเครื่องใช้ไฟฟ้า">
+      </div>
+      <div class="slide">
+        <img src="/images/03.png" alt="ลดราคาพิเศษ">
+      </div>
+    </div>
+
+    <button class="prev">&#10094;</button>
+    <button class="next">&#10095;</button>
+  </div>
+
+  <main class="container">
+    <div class="service-features">
+      <div class="feature-item">
+        <img src="/images/technician.png" alt="ช่างมืออาชีพ">
+        <p>ช่างมืออาชีพ ใส่ใจทุกขั้นตอน</p>
+      </div>
+      <div class="feature-item">
+        <img src="/images/coin-on-hand.png" alt="ราคาชัดเจน">
+        <p>ราคาชัดเจน ไม่บานปลาย</p>
+      </div>
+      <div class="feature-item">
+        <img src="/images/warranty.png" alt="รับประกันงานซ่อม">
+        <p>รับประกันงานคุณภาพงาน</p>
+      </div>
+    </div>
+    
+    <h1>บริการทั้งหมด</h1>
+    <div class="categories">
+      <% categories.forEach(cat => { %>
+        <div class="category-card">
+          <a href="/services/<%= cat.id %>">
+            <img src="<%= cat.image_path %>" alt="<%= cat.name %>">
+            <p><%= cat.name %></p>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  </main>
+
+  <script>
+  const slides = document.querySelector('.slides');
+  const slideElements = document.querySelectorAll('.slide');
+  const slidesCount = slideElements.length;
+  const intervalTime = 5000; // 5 วินาที
+
+  let index = 1; // เริ่มจากสไลด์จริงภาพแรก (ไม่ใช่ clone)
+  let autoSlide;
+
+  //  Clone สไลด์แรกและสุดท้าย
+  const firstClone = slideElements[0].cloneNode(true);
+  const lastClone = slideElements[slidesCount - 1].cloneNode(true);
+
+  slides.appendChild(firstClone);
+  slides.insertBefore(lastClone, slideElements[0]);
+
+  const allSlides = document.querySelectorAll('.slide');
+  const totalSlides = allSlides.length;
+
+  slides.style.width = `${totalSlides * 100}%`;
+  allSlides.forEach(slide => {
+    slide.style.width = `${100 / totalSlides}%`;
+  });
+
+  //  ตั้งค่าเริ่มต้นให้เลื่อนไปภาพแรก (หลัง clone)
+  slides.style.transform = `translateX(-${index * (100 / totalSlides)}%)`;
+
+  function moveSlide(n) {
+    index += n;
+    slides.style.transition = 'transform 0.6s ease-in-out';
+    slides.style.transform = `translateX(-${index * (100 / totalSlides)}%)`;
+  }
+
+  slides.addEventListener('transitionend', () => {
+    //  ถ้าถึง clone สุดท้าย → กลับไปภาพแรกโดยไม่เห็นการดีด
+    if (allSlides[index].isSameNode(firstClone)) {
+      slides.style.transition = 'none';
+      index = 1;
+      slides.style.transform = `translateX(-${index * (100 / totalSlides)}%)`;
+    }
+
+    //  ถ้าถึง clone แรก → กลับไปภาพสุดท้าย
+    if (allSlides[index].isSameNode(lastClone)) {
+      slides.style.transition = 'none';
+      index = slidesCount;
+      slides.style.transform = `translateX(-${index * (100 / totalSlides)}%)`;
+    }
+  });
+
+  //  Auto Slide
+  function startAutoSlide() {
+    autoSlide = setInterval(() => moveSlide(1), intervalTime);
+  }
+
+  function resetAutoSlide() {
+    clearInterval(autoSlide);
+    startAutoSlide();
+  }
+
+  // ปุ่ม
+  document.querySelector('.prev').addEventListener('click', () => {
+    moveSlide(-1);
+    resetAutoSlide();
+  });
+
+  document.querySelector('.next').addEventListener('click', () => {
+    moveSlide(1);
+    resetAutoSlide();
+  });
+
+  startAutoSlide();
+</script>
+
+
+
+</body>
+</html>

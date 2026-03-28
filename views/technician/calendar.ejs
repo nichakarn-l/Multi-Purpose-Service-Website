@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>ตารางงาน</title>
+  <link rel="stylesheet" href="/styles/index_technician.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+  <!-- ใช้ index.global.min.js แทน main.min.js -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Top Navbar -->
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/technician/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/technician/dashboard"><i class="material-icons">home</i> หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'calendar' ? 'active' : '' %>">
+            <a href="/technician/calendar"><i class="material-icons">calendar_today</i> ตารางงาน</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/technician/bookings"><i class="material-icons">assignment</i> รายการงาน</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/completed"><i class="material-icons">check_circle</i> งานที่สำเร็จแล้ว</a>
+          </li>
+          <li class="<%= currentPage === 'profile' ? 'active' : '' %>">
+            <a href="/technician/profile"><i class="material-icons">account_circle</i> แก้ไขข้อมูล</a>
+        </li>
+          <li>
+            <a href="/technician/logout"><i class="material-icons">logout</i> ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      
+      
+      <div id="calendar">
+      </div>
+
+      <!-- Popup รายละเอียดงาน -->
+      <div id="bookingModal" class="booking-modal">
+        <div class="booking-modal-content">
+          <!-- ปิด popup รายละเอียด -->
+          <span class="booking-close" id="detailClose">&times;</span>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+
+      <!-- Popup ขอเลื่อน -->
+      <div id="rescheduleModal" class="booking-modal">
+        <div class="booking-modal-content">
+          <!-- ปิด popup ขอเลื่อน -->
+          <span class="booking-close" id="rescheduleClose">&times;</span>
+
+          <h3 style="text-align:center; font-size:20px;">ขอเลื่อนวัน–เวลาให้บริการ</h3>
+          <div class="reschedule-booking-info">
+            <p><strong>บริการ:</strong> <span id="rescheduleServiceName"></span></p>
+            <p><strong>วันที่เดิม:</strong> <span id="rescheduleDate"></span></p>
+            <p><strong>เวลาเดิม:</strong> <span id="rescheduleTime"></span></p>
+          </div>
+
+          <hr>
+          <p>กรุณาเลือกเหตุผลในการขอเลื่อนวัน-เวลา</p>
+
+          <label>
+            <input type="radio" name="reason" value="personal">
+            ติดภารกิจเร่งด่วน
+          </label><br>
+
+          <label>
+            <input type="radio" name="reason" value="emergency">
+            เหตุสุดวิสัย / เหตุฉุกเฉิน
+          </label>
+
+          <br><br>
+          <textarea class="reschedule-textarea"
+            id="rescheduleNote"
+            placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)">
+          </textarea>
+
+          <div class="modal-buttons">
+            <button id="cancelReschedule" class="btn-cancel">
+              ยกเลิก
+            </button>
+
+            <button id="confirmReschedule" class="btn-submitwr" disabled>
+              ยืนยัน
+            </button>
+          </div>
+
+            
+          
+        </div>
+      </div>
+
+
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const calendarEl = document.getElementById('calendar');
+      const modal = document.getElementById('bookingModal');
+      const modalBody = document.getElementById('modal-body');
+      
+      const detailClose = document.getElementById('detailClose');
+      const rescheduleClose = document.getElementById('rescheduleClose');
+
+      const rescheduleModal = document.getElementById('rescheduleModal');
+      
+
+      let selectedBookingId = null;
+      let selectedBookingData = null;
+
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'th',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: <%- JSON.stringify(bookings) %>,
+
+        eventClick: function(info) {
+          info.jsEvent.preventDefault();
+
+          const event = info.event;
+          const start = new Date(event.start);
+          const props = event.extendedProps;
+
+          selectedBookingId = props.bookingId;
+          selectedBookingData = {
+            service: event.title,
+            date: start.toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' }),
+            time: start.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' })
+          };
+
+          const MAX_RESCHEDULE = 1; //เลื่อน
+          let rescheduleButtonHTML = '';
+
+          // คำนวณว่าห่างจากวันนี้กี่วัน new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" })
+          const now = new Date();
+          const bookingDate = new Date(event.start);
+
+          now.setHours(0,0,0,0);
+          bookingDate.setHours(0,0,0,0);
+
+          const diffDays = (bookingDate - now) / (1000 * 60 * 60 * 24);
+
+          if (
+            props.status === 'รอดำเนินการ' &&
+            props.rescheduleCount < MAX_RESCHEDULE &&
+            diffDays >= 1
+          ) {
+
+            rescheduleButtonHTML = `
+              <div class="reschedule-note">
+                 <i class="material-icons">warning</i>
+                สามารถขอเลื่อนวัน–เวลาได้เพียง ${MAX_RESCHEDULE} ครั้งต่อการจอง
+              </div>
+
+              <div style="text-align:right; margin-top:20px;">
+                <button id="openReschedule" class="btn-warning">
+                  ขอเลื่อนวัน–เวลา
+                </button>
+              </div>
+            `;
+
+          } else if (props.rescheduleCount >= MAX_RESCHEDULE ) {
+
+            rescheduleButtonHTML = `
+              <div class="reschedule-limit-box">
+                <i class="material-icons">info</i>
+                คุณได้ใช้สิทธิ์การเลื่อนงานนี้ไปแล้ว ${MAX_RESCHEDULE} ครั้งแล้ว
+              </div>
+            `;
+
+          } else if (diffDays < 1 && props.status === 'รอดำเนินการ') {
+
+            rescheduleButtonHTML = `
+              <div class="reschedule-limit-box">
+                ไม่สามารถขอเลื่อนล่วงหน้าน้อยกว่า 1 วันได้
+              </div>
+            `;
+          }
+
+          modalBody.innerHTML = `
+            <h3>รายละเอียดงาน</h3>
+            <p><strong>บริการ:</strong> ${event.title}</p>
+            <p><strong>วันนัดหมาย:</strong>
+              ${start.toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' })}
+            </p>
+            <p><strong>เวลานัดหมาย:</strong>
+              ${start.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' })} น.
+            </p>
+            <hr>
+            <h3>ข้อมูลผู้จอง</h3>
+            <p><strong>ชื่อ:</strong> ${props.customerName}</p>
+            <p><strong>เบอร์:</strong> ${props.phone}</p>
+            <p><strong>ที่อยู่:</strong> ${props.address}</p>
+            ${rescheduleButtonHTML}
+          `;
+
+          modal.style.display = 'block';
+
+          // เพิ่ม event listener เฉพาะถ้ามีปุ่ม
+          const openRescheduleBtn = document.getElementById('openReschedule');
+            if (openRescheduleBtn) {
+              openRescheduleBtn.onclick = () => {
+
+                //ใส่ข้อมูลนัดหมายลงใน popup ขอเลื่อน
+                document.getElementById('rescheduleServiceName').textContent = event.title;
+                document.getElementById('rescheduleDate').textContent =
+                  start.toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' });
+
+                document.getElementById('rescheduleTime').textContent =
+                  start.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }) + ' น.';
+
+                // 🔹 reset form ทุกครั้งที่เปิด
+                document.querySelectorAll('input[name="reason"]').forEach(r => r.checked = false);
+                document.getElementById('rescheduleNote').value = '';
+                document.getElementById('confirmReschedule').disabled = true;
+
+                modal.style.display = 'none';
+                rescheduleModal.style.display = 'block';
+              };
+            }
+
+        }
+      });
+
+      calendar.render();
+
+      detailClose.onclick = () => modal.style.display = 'none';
+      rescheduleClose.onclick = () => rescheduleModal.style.display = 'none';
+
+      document.getElementById('cancelReschedule').onclick = () => {
+        rescheduleModal.style.display = 'none';
+      };
+
+
+      // 🔹 เปิดปุ่มเมื่อเลือกเหตุผล
+      const radios = document.querySelectorAll('input[name="reason"]');
+      const confirmBtn = document.getElementById('confirmReschedule');
+
+      radios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          confirmBtn.disabled = false;
+        });
+      });
+
+
+      document.getElementById('confirmReschedule').onclick = () => {
+        const reason = document.querySelector('input[name="reason"]:checked');
+        const note = document.getElementById('rescheduleNote').value;
+
+        console.log('Selected booking ID:', selectedBookingId); // 🔹 ตรวจสอบ ID
+
+        if (!reason) {
+          alert('กรุณาเลือกเหตุผล');
+          return;
+        }
+
+        fetch('/technician/calendar/request-reschedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: selectedBookingId,
+            reason: reason.value,
+            note: note
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Response:', data); // 🔹 ตรวจสอบ server ส่งกลับ
+          alert(data.message);
+          rescheduleModal.style.display = 'none';
+          location.reload();
+        })
+        .catch(err => {
+          console.error('Fetch error:', err);
+          alert('เกิดข้อผิดพลาดในการส่งคำขอเลื่อน');
+        });
+      };
+
+
+      //ปิดเมื่อกดพื้นหลัง
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      rescheduleModal.addEventListener('click', function(e) {
+        if (e.target === rescheduleModal) {
+          rescheduleModal.style.display = 'none';
+        }
+      });
+
+    });
+    </script>
+
+</body>
+</html>

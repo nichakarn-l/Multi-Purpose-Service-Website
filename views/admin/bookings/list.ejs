@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - รายการจองบริการ</title>
+  <link rel="stylesheet" href="/styles/index_admin.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <style>
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px 28px;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: slideIn 0.3s ease;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 26px;
+  color: #999;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.modal-content p {
+  margin: 6px 0;
+}
+
+hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.map-icon-link img {
+  vertical-align: middle;
+  margin-left: 4px;
+  width: 20px;
+  height: 20px;
+}
+</style>
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+    
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+          <h1>รายการจองบริการ</h1>
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">ลำดับที่</th>
+                <th>ชื่อผู้ใช้บริการ</th>
+                <th>บริการ</th>
+                <!--
+                <th>จำนวนจุด</th>
+                <th>ราคา</th>
+                -->
+                <th>วันนัดหมาย</th>
+                <th>เวลานัดหมาย</th>
+                <th>ช่างผู้ให้บริการ</th>
+                <th>สถานะ</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if (bookings.length === 0) { %>
+                <tr>
+                  <td colspan="9" style="text-align: center;">ไม่มีรายการจอง</td>
+                </tr>
+              <% } else { %>
+                <% bookings.forEach((booking, index) => { %>
+                  <tr>
+                    <td ><%= booking.id%></td>
+                    <td><%= booking.customer_name %></td>
+                    <td><%= booking.service_name || '-' %></td>
+                    <!--
+                    <td><%= booking.point_count || '-' %></td>
+                    <td><%= booking.final_price || '-' %></td>
+                    -->
+                    
+                    <td>
+                      <%= booking.booking_date 
+                        ? new Date(booking.booking_date).toLocaleDateString('th-TH', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: '2-digit' 
+                          }) 
+                        : '-' 
+                      %>
+                    </td>
+
+
+                    <td><%= booking.booking_time ? booking.booking_time.slice(0,5) : '-' %> น.</td>
+                    <td><%= booking.technician_name %></td>
+                    <td class="booking-status booking-status-<%= booking.status %>">
+                      <%= booking.status_text %>
+                    </td>
+                    <td>
+                      <button onclick="openModal(<%= booking.id %>)" class="btn-show">ดูรายละเอียด</button>
+
+                    </td>
+
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <!--  Modal -->
+        <div id="bookingModal" class="modal" style="display:none;">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>รายละเอียดงาน</h3>
+
+            <p><strong>บริการ:</strong> <span id="modal-service"></span></p>
+            <p><strong>จำนวน:</strong> <span id="modal-point_count"></span></p>
+            <p><strong>วันนัดหมาย:</strong> <span id="modal-date"></span></p>
+            <p><strong>เวลานัดหมาย:</strong> <span id="modal-time"></span> น.</p>
+            <p><strong>ราคา:</strong> <span id="modal-total-price"></span> บาท</p>
+            <p><strong>สถานะ:</strong> <span id="modal-status"></span></p>
+
+            <hr>
+            <h3>ข้อมูลผู้จอง</h3>
+            <p><strong>ชื่อผู้ใช้บริการ:</strong> <span id="modal-customer_name"></span></p>
+            <p><strong>เบอร์โทร:</strong> <span id="modal-customer_phone"></span></p>
+            <p>
+              <strong>ที่อยู่:</strong> <span id="modal-address"></span>
+              <a id="modal-map-link" href="#" target="_blank" title="เปิดในแผนที่ (Google Maps)" class="map-icon-link" style="display:none;">
+                <img src="https://img.icons8.com/color/36/google-maps.png" alt="map icon">
+              </a>
+            </p>
+
+            <hr>
+            <h3>ข้อมูลช่างให้บริการ</h3>
+            <p><strong>ชื่อช่างให้บริการ:</strong> <span id="modal-tech_name"></span></p>
+            <p><strong>เบอร์โทร:</strong> <span id="modal-tech_phone"></span></p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+<script>
+  const bookingData = <%- JSON.stringify(bookings) %>;
+  let currentBookingId = null;
+
+  //  รวมที่อยู่ลูกค้าให้อ่านง่าย
+  function formatAddress(b) {
+    const parts = [];
+    if (b.house_number) parts.push(b.house_number);
+    if (b.road) parts.push("ถนน" + b.road);
+    if (b.suburb) parts.push("แขวง" + b.suburb);
+    if (b.district) parts.push("เขต" + b.district);
+    if (b.city) parts.push(b.city);
+    if (b.postcode) parts.push(b.postcode);
+    return parts.join(" ") || "-";
+  }
+
+  //  ฟังก์ชันแปลงวันที่
+  function formatDate(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  }
+
+  //  ฟังก์ชันแปลงเวลา
+  function formatTime(timeStr) {
+    if (!timeStr) return "-";
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(timeStr)) {
+      return timeStr.substring(0, 5);
+    }
+    const d = new Date(timeStr);
+    return d.toLocaleTimeString("th-TH", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  //  เปิด modal และใส่ข้อมูล
+  function openModal(bookingId) {
+    const booking = bookingData.find(b => b.id === bookingId);
+    if (!booking) return;
+    currentBookingId = booking.id;
+
+    // ข้อมูลการจอง
+    document.getElementById("modal-service").innerText = booking.service_name || "-";
+    document.getElementById("modal-point_count").innerText = booking.point_count ? `${booking.point_count} จุด` : "-";
+    document.getElementById("modal-date").innerText = formatDate(booking.booking_date);
+    document.getElementById("modal-time").innerText = formatTime(booking.booking_time);
+    
+    const price = booking.total_price;
+    document.getElementById("modal-total-price").innerText = 
+      price !== null && price !== undefined
+        ? Number(price).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })
+        : "-";
+
+    document.getElementById("modal-status").innerText = booking.status_text || "-";
+
+    //ข้อมูลผู้จอง
+    document.getElementById("modal-customer_name").innerText = booking.customer_name || "-";
+    document.getElementById("modal-customer_phone").innerText = booking.customer_phone || "-";
+
+    document.getElementById("modal-address").innerText = booking.user_address;
+
+    // ข้อมูลช่างให้บริการ
+    document.getElementById("modal-tech_name").innerText = booking.technician_name || "-";
+    document.getElementById("modal-tech_phone").innerText = booking.tech_phone || "-";
+
+    // เพิ่มแสดงที่อยู่ช่างด้วย (ถ้ามี)
+    const techAddressElem = document.getElementById("modal-tech_address");
+    if (techAddressElem) {
+      techAddressElem.innerText = booking.technician_address || "-";
+    }
+
+    //  เปิด modal
+    document.getElementById("bookingModal").style.display = "flex";
+  }
+
+  //  ปิด modal
+  function closeModal() {
+    document.getElementById("bookingModal").style.display = "none";
+  }
+
+  //  ปิดเมื่อคลิกนอก modal
+  window.onclick = (e) => {
+    const modal = document.getElementById("bookingModal");
+    if (e.target === modal) closeModal();
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>การจองของฉัน</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+ <style>
+  /* Modal Overlay */
+  #rescheduleModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  #rescheduleModal.show {
+    display: flex;
+  }
+
+  /* Modal Box */
+  #rescheduleModal .modal-content {
+    background: #fff;
+    padding: 24px;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    font-family: 'Kanit', sans-serif;
+    position: relative;
+  }
+
+  /* Close Button (X) */
+  #rescheduleModal .close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #666;
+  }
+
+  #rescheduleModal .close:hover {
+    color: #000;
+  }
+
+  #rescheduleModal h3 {
+    text-align: center;
+    margin-top: 0;
+    font-size: 22px;
+    color: #183C91;
+    margin-bottom: 16px;
+  }
+
+  #rescheduleModal label {
+    display: block;
+    margin: 14px 0 6px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  #rescheduleModal input,
+  #rescheduleModal select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  /* Buttons */
+  #rescheduleModal .form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  #rescheduleModal #rescheduleCancel,
+  #rescheduleModal .btn-submit {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  #rescheduleModal #rescheduleCancel {
+    background: #ccc;
+    color: #333;
+  }
+
+  #rescheduleModal #rescheduleCancel:hover {
+    background: #aaa;
+  }
+
+  #rescheduleModal .btn-submit {
+    background: #183C91;
+    color: #fff;
+  }
+
+  #rescheduleModal .btn-submit:hover {
+    background: #0d2c70;
+  }
+</style>
+
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+      <div class="navbar-right">
+        <div class="profile-dropdown">
+          <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+          <div class="dropdown-menu">
+            <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="breadcrumb">
+      <a href="/">หน้าหลัก</a>
+      <i class="fas fa-angle-right"></i>
+      <a href="/my-bookings">ประวัติการจอง</a>
+    </div>
+    <div class="profile-page">
+      <div class="profile-sidebar">
+        <h3>บัญชีของฉัน</h3>
+        <ul>
+          <li><a href="/edit-profile">ข้อมูลส่วนตัว</a></li>
+          <li><a href="/my-bookings" class="active">ประวัติการจอง</a></li>
+          <li><a href="/reviews">รีวิวของฉัน</a></li>
+        </ul>
+          <ul>
+            <li><a href="/logout" class="logout">ออกจากระบบ</a></li>
+        </ul>
+      </div>
+
+      
+      <div class="mybook-content">
+        <h1>ประวัติการจอง</h1>
+
+        
+        <% if (bookings.length === 0) { %>
+          <p class="no-booking">คุณยังไม่มีการจอง</p>
+        <% } else { %>
+          <% bookings.forEach(booking => { %>
+            <div class="mybooking-card" 
+              data-id="<%= booking.id %>" 
+              data-status="<%= booking.status %>"
+              data-date="<%= booking.booking_date.getFullYear() %>-<%= 
+                String(booking.booking_date.getMonth()+1).padStart(2,'0') %>-<%= 
+                String(booking.booking_date.getDate()).padStart(2,'0') %>"
+
+              data-time="<%= booking.booking_time.slice(0,5) %>"
+              data-service-id="<%= booking.service_id %>" 
+              data-technician-id="<%= booking.technician_id %>"
+              style="cursor: pointer;">
+
+
+  
+              <p></i>หมายเลขการจอง: <%= booking.id %></p>
+              
+              <p><i class="fa-solid fa-wrench"></i> บริการ: <%= booking.service_name %></p>
+              <p><i class="fa-solid fa-calendar-days"></i> วันที่จอง: <%= booking.booking_date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) %> เวลา <%= booking.booking_time.slice(0, 5) %> น.</p>
+              
+              <!-- 
+              <p>ราคามัดจำ: <%= booking.deposit_amount %> บาท</p>
+              <p><strong>ยอดคงเหลือ: <%= Number(booking.remainingAmount || 0).toFixed(2) %> บาท</strong></p>
+              -->
+              <p>
+                <i class="fa-solid fa-circle-info"></i> 
+                สถานะ:
+                <span class="booking-status booking-status-<%= booking.status %>">
+                  <%= booking.statusText %>
+                </span>
+              </p>
+
+
+              <!-- แจ้งลูกค้า -->
+              <% if (booking.status === 'need_reschedule') { %>
+
+                <div class="reschedule-alert">
+                  <div class="reschedule-title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    แจ้งขอเปลี่ยนวัน-เวลาให้บริการจากช่าง
+                  </div>
+
+                  <div class="reschedule-detail">
+                    <div>
+                      <span class="label">เหตุผล:</span>
+                      <span class="value"><%= booking.rescheduleReasonText || '-' %></span>
+                    </div>
+
+                    <% if (booking.reschedule_note) { %>
+                      <div>
+                        <span class="label">หมายเหตุ:</span>
+                        <span class="value"><%= booking.reschedule_note %></span>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <!-- ปุ่มเลือกวัน-เวลาใหม่ -->
+                  <div class="reschedule-action">
+                    <button
+                      type="button"
+                      class="btn-reschedule"
+                      data-booking-id="<%= booking.id %>">
+                      เลือกวัน–เวลาใหม่
+                    </button>
+                  </div>
+
+                </div>
+
+              <% }else if (booking.status === 'completed' && !booking.hasReview) { %>
+                <!-- ปุ่มรีวิว -->
+                 <div class="review-btn-wrapper">
+
+                  <button class="btn-review" data-booking-id="<%= booking.id %>">ให้คะแนน</button>
+                 </div>
+                
+              <% } else if (booking.hasReview) { %>
+                <p>ขอบคุณสำหรับการรีวิว</p>
+              <% } %>
+            </div>
+          <% }) %>
+
+          <!-- popup modal -->
+          <div id="reviewModal">
+            <div class="review-modal-content">
+              <h2>รีวิวบริการ</h2>
+              <form id="reviewForm">
+                <input type="hidden" name="booking_id" id="booking_id" />
+                <input type="hidden" name="rating" id="rating" />
+
+                <label>คะแนน:</label>
+                <div class="star-rating">
+                  <span class="star" data-value="1">&#9733;</span>
+                  <span class="star" data-value="2">&#9733;</span>
+                  <span class="star" data-value="3">&#9733;</span>
+                  <span class="star" data-value="4">&#9733;</span>
+                  <span class="star" data-value="5">&#9733;</span>
+                </div>
+
+                <label for="comment">ความคิดเห็น:</label>
+                <textarea name="comment" id="comment" rows="4" required></textarea>
+
+                <div class="form-buttons">
+                  <button type="button" id="closeModal" class="btn-cancel">ยกเลิก</button>
+                  <button type="submit" class="btn-summitreview">ส่งรีวิว</button>
+                  
+                </div>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- เลื่อนวันเวลานัด -->
+          <div id="rescheduleModal" class="modal">
+            <div class="modal-content">
+              <span class="close" id="rescheduleClose">&times;</span>
+
+              <h3>เลื่อนวัน-เวลา</h3>
+
+              <form id="rescheduleForm">
+                <input type="hidden" name="booking_id" id="reschedule_booking_id">
+
+                <label>เลือกวันที่ใหม่:</label>
+                <input type="text" id="reschedule_date_display" required placeholder="วัน/เดือน/ปี">
+                <input type="hidden" id="reschedule_date" name="new_date">
+
+                <label>เลือกเวลาที่ใหม่:</label>
+                <select id="reschedule_time" name="new_time" required>
+                  <option value="">-- กรุณาเลือกเวลา --</option>
+                </select>
+
+
+                <div class="form-buttons">
+                  <button type="button" id="rescheduleCancel">ยกเลิก</button>
+                  <button type="submit" class="btn-submit">บันทึก</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+
+
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const modal = document.getElementById('reviewModal');
+    const closeModal = document.getElementById('closeModal');
+    const reviewForm = document.getElementById('reviewForm');
+    const bookingIdInput = document.getElementById('booking_id');
+
+    document.querySelectorAll('.btn-review').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bookingIdInput.value = btn.getAttribute('data-booking-id');
+        modal.style.display = 'flex';  // flex เพื่อจัดกึ่งกลาง modal
+      });
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', e => {
+      if(e.target === modal){
+        modal.style.display = 'none';
+      }
+    });
+
+    reviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        booking_id: bookingIdInput.value,
+        rating: reviewForm.rating.value,
+        comment: reviewForm.comment.value
+      };
+
+      try {
+        const response = await fetch('/customer/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if(result.success){
+          alert('ขอบคุณสำหรับรีวิว!');
+          modal.style.display = 'none';
+          location.reload();
+        } else {
+          alert('เกิดข้อผิดพลาด: ' + (result.error || 'ไม่สามารถส่งรีวิวได้'));
+        }
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+      }
+    });
+
+
+    
+  </script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const rescheduleModal = document.getElementById('rescheduleModal');
+    const rescheduleClose = document.getElementById('rescheduleClose');
+    const rescheduleCancel = document.getElementById('rescheduleCancel');
+    const rescheduleForm = document.getElementById('rescheduleForm');
+    const rescheduleBookingIdInput = document.getElementById('reschedule_booking_id');
+    const rescheduleDateDisplay = document.getElementById('reschedule_date_display');
+    const rescheduleDateHidden = document.getElementById('reschedule_date');
+    const rescheduleTimeSelect = document.getElementById('reschedule_time');
+
+    let originalDate = null;
+    let originalTime = null;
+
+    function formatThaiDate(dateObj) {
+      const months = [
+        "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+      ];
+      const d = dateObj.getDate();
+      const m = months[dateObj.getMonth()];
+      const y = dateObj.getFullYear() + 543;
+      return `${d} ${m} ${y}`;
+    }
+
+    // Flatpickr
+    const reschedulePicker = flatpickr(rescheduleDateDisplay, {
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d F Y",
+      minDate: "today",
+      maxDate: new Date().fp_incr(30),
+
+      onChange: function(selectedDates) {
+
+        if (selectedDates.length > 0) {
+
+          reschedulePicker.altInput.value = formatThaiDate(selectedDates[0]);
+
+          const yyyy = selectedDates[0].getFullYear();
+          const mm = String(selectedDates[0].getMonth() + 1).padStart(2, '0');
+          const dd = String(selectedDates[0].getDate()).padStart(2, '0');
+          const isoDate = `${yyyy}-${mm}-${dd}`;
+
+          rescheduleDateHidden.value = isoDate;
+
+          const bookingId = rescheduleBookingIdInput.value;
+          const card = document.querySelector(`.mybooking-card[data-id="${bookingId}"]`);
+
+          const serviceId = card.dataset.serviceId;
+          const technicianId = card.dataset.technicianId;
+
+          fetchAvailableTimes(isoDate, serviceId, technicianId, bookingId);
+        }
+      }
+    });
+
+
+    // ======================
+    // เปิด modal
+    // ======================
+    document.querySelectorAll('.btn-reschedule').forEach(btn => {
+
+      btn.addEventListener('click', (e) => {
+
+        e.stopPropagation();
+
+        const bookingId = btn.dataset.bookingId;
+        rescheduleBookingIdInput.value = bookingId;
+
+        const card = btn.closest('.mybooking-card');
+
+        const bookingDate = card.dataset.date;
+        const bookingTime = card.dataset.time;
+
+        originalDate = bookingDate || null;
+        originalTime = bookingTime ? bookingTime.slice(0,5) : null;
+
+        rescheduleModal.style.display = 'flex';
+
+        // clear picker
+        reschedulePicker.clear();
+        rescheduleDateHidden.value = '';
+        rescheduleDateDisplay.value = '';
+
+        // reset time dropdown
+        rescheduleTimeSelect.innerHTML =
+          '<option value="">-- กรุณาเลือกเวลา --</option>';
+      });
+
+    });
+
+
+    // ======================
+    // ปิด modal / reset
+    // ======================
+    function resetRescheduleModal() {
+
+      rescheduleModal.style.display = 'none';
+
+      reschedulePicker.clear();
+
+      rescheduleDateHidden.value = '';
+      rescheduleDateDisplay.value = '';
+
+      rescheduleTimeSelect.innerHTML =
+        '<option value="">-- กรุณาเลือกเวลา --</option>';
+
+      rescheduleBookingIdInput.value = "";
+
+      originalDate = null;
+      originalTime = null;
+    }
+
+    rescheduleClose.addEventListener('click', resetRescheduleModal);
+    rescheduleCancel.addEventListener('click', resetRescheduleModal);
+
+    window.addEventListener('click', e => {
+      if (e.target === rescheduleModal) resetRescheduleModal();
+    });
+
+
+    
+    // fetch เวลา
+    async function fetchAvailableTimes(date, serviceId, technicianId, excludeBookingId) {
+
+      if (!date || !serviceId) return;
+
+      try {
+
+        let url = `/available-times?date=${date}&service_id=${serviceId}`;
+
+        //if (technicianId) url += `&technician_id=${technicianId}`;
+        if (excludeBookingId) url += `&exclude_booking_id=${excludeBookingId}`;
+
+        const response = await fetch(url);
+        const times = await response.json();
+
+        rescheduleTimeSelect.innerHTML =
+          '<option value="">-- กรุณาเลือกเวลา --</option>';
+
+        const now = new Date();
+        const selectedDate = new Date(date);
+        const isToday = selectedDate.toDateString() === now.toDateString();
+
+        times.forEach(({ time, booked }) => {
+
+        const option = document.createElement('option');
+        const normalizedTime = time.slice(0,5);
+
+        option.value = normalizedTime;
+        option.textContent = normalizedTime;
+
+        const originalDateOnly = originalDate
+          ? originalDate.substring(0,10)
+          : null;
+
+        const isSameDate = originalDateOnly === date;
+        const isSameTime = originalTime === normalizedTime;
+
+        // ===== เต็มแล้ว =====
+        if (booked) {
+          option.disabled = true;
+          option.textContent += ' (เต็มแล้ว)';
+        }
+
+        // ===== เวลาผ่านแล้ว =====
+        else if (isToday) {
+          const [h, m] = normalizedTime.split(':').map(Number);
+
+          if (h*60 + m <= now.getHours()*60 + now.getMinutes()) {
+            option.disabled = true;
+            option.style.color = 'gray';
+          }
+        }
+
+        rescheduleTimeSelect.appendChild(option);
+
+      });
+
+
+        
+
+      } catch(err) {
+
+        console.error('Error fetching times:', err);
+
+      }
+    }
+
+
+    // ======================
+    // submit
+    // ======================
+    rescheduleForm.addEventListener('submit', async (e) => {
+
+      e.preventDefault();
+
+      const booking_id = rescheduleBookingIdInput.value;
+      const new_date = rescheduleDateHidden.value;
+      const new_time = rescheduleTimeSelect.value;
+
+      if (!new_date || !new_time) {
+        alert('กรุณาเลือกวันและเวลาใหม่');
+        return;
+      }
+
+      try {
+
+        const response = await fetch('/customer/reschedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ booking_id, new_date, new_time })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+
+          alert('เลื่อนวัน-เวลาเรียบร้อยแล้ว');
+
+          rescheduleModal.style.display = 'none';
+
+          location.reload();
+
+        } else {
+
+          alert('เกิดข้อผิดพลาด: ' + (result.error || 'ไม่สามารถเลื่อนวัน-เวลาได้'));
+
+        }
+
+      } catch(err) {
+
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+
+      }
+
+    });
+
+  });
+</script>
+
+
+
+  <!--ดาว!-->
+  <script>
+    // Star rating interaction
+    const stars = document.querySelectorAll('.star-rating .star');
+    const ratingInput = document.getElementById('rating');
+
+    stars.forEach((star, index) => {
+      star.addEventListener('mouseover', () => highlightStars(index));
+      star.addEventListener('mouseout', resetStars);
+      star.addEventListener('click', () => selectStars(index));
+    });
+
+    let selectedIndex = -1;
+
+    function highlightStars(index) {
+      stars.forEach((star, i) => {
+        star.classList.toggle('hovered', i <= index);
+      });
+    }
+
+    function resetStars() {
+      stars.forEach((star) => star.classList.remove('hovered'));
+    }
+
+    function selectStars(index) {
+      selectedIndex = index;
+      ratingInput.value = stars[index].dataset.value;
+      stars.forEach((star, i) => {
+        star.classList.toggle('selected', i <= index);
+      });
+    }
+
+    // Modal open/close
+    const reviewModal = document.getElementById('reviewModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // เปิด modal (เรียกจากปุ่มอื่น เช่นปุ่ม “รีวิว”)
+    function openReviewModal(bookingId) {
+      document.getElementById('booking_id').value = bookingId;
+      reviewModal.classList.add('show');
+    }
+
+    // ปิด modal
+    closeModalBtn.addEventListener('click', () => {
+      reviewModal.classList.remove('show');
+      resetForm();
+    });
+
+    function resetForm() {
+      document.getElementById('reviewForm').reset();
+      ratingInput.value = "";
+      selectedIndex = -1;
+      stars.forEach(star => star.classList.remove('selected'));
+    }
+
+
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.mybooking-card');
+
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        // ถ้าคลิกปุ่มรีวิว ให้ไม่ redirect
+        if (e.target.classList.contains('btn-review')) return;
+
+        const bookingId = card.dataset.id;
+        window.location.href = `/booking-detail/${bookingId}`;
+      });
+    });
+  });
+  </script>
+
+</body>
+</html>

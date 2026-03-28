@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - รายการจองบริการ</title>
+  <link rel="stylesheet" href="/styles/index_admin.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class = "content">
+        <div class="list-card">
+          <h1>รายการรอตรวจสอบ</h1>
+          <table class="tech-table">
+            <thead>
+            <tr>
+              <th>ลำดับที่</th>
+              <th>ชื่อผู้ใช้บริการ</th>
+              <th>บริการ</th>
+              <th>ยอดชำระ</th>
+              <th>สถานะ</th>
+              <th>สลิปการชำระเงิน</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (pendingPayments.length === 0) { %>
+              <tr><td colspan="7" style="text-align:center;">ไม่มีรายการรอตรวจสอบ</td></tr>
+            <% } else { %>
+              <% pendingPayments.forEach((payment, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= payment.first_name %> <%= payment.last_name %></td>
+                  <td><%= payment.service_name %></td>
+                  <td><%= Number(payment.amount).toFixed(2) %> บาท</td>
+                  <td><span style="color: orange;">รอตรวจสอบ</span></td>
+                  <td>
+  <% if (payment.slip_image_path) { %>
+    <img src="<%= payment.slip_image_path %>" class="slip-thumbnail"
+         onclick="openSlipModal('<%= payment.slip_image_path %>')" alt="slip">
+  <% } else { %> - <% } %>
+</td>
+                  <td>
+                    <form action="/admin/payments/confirm" method="POST" style="display:inline;">
+                      <input type="hidden" name="payment_id" value="<%= payment.id %>">
+                      <button type="submit" class="confirm-btn" onclick="return confirm('ยืนยันการชำระเงินนี้?')">ยืนยัน</button>
+                    </form>
+                    <form action="/admin/payments/reject" method="POST" style="display:inline;">
+                      <input type="hidden" name="payment_id" value="<%= payment.id %>">
+                      <button type="submit" class="reject-btn" onclick="return confirm('คุณแน่ใจว่าต้องการปฏิเสธ?')">ปฏิเสธ</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
+          </tbody>
+        </table>
+        </div>
+      <div class="list-card">
+      
+        
+        <h1>ประวัติการชำระเงินทั้งหมด</h1>
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>ลำดับที่</th>
+                <th>ชื่อผู้ใช้บริการ</th>
+                <th>บริการ</th>
+                <th>ยอดชำระ</th>
+                <th>สถานะ</th>
+                <th>สลิปการชำระเงิน</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (payments.length === 0) { %>
+                <tr><td colspan="6" style="text-align:center;">ไม่มีข้อมูลการชำระเงิน</td></tr>
+              <% } else { %>
+                <% payments.forEach((payment, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= payment.first_name %> <%= payment.last_name %></td>
+                    <td><%= payment.service_name %></td>
+                    <td><%= Number(payment.amount).toFixed(2) %> บาท</td>
+                    <td>
+                      <% if (payment.status === 'confirmed') { %>
+                        <span style="color: green;">ตรวจสอบแล้ว</span>
+                      <% } else if (payment.status === 'rejected') { %>
+                        <span style="color: red;">ปฏิเสธ</span>
+                      <% } else { %>
+                        <span style="color: orange;">รอตรวจสอบ</span>
+                      <% } %>
+                    </td>
+                    <td>
+  <% if (payment.slip_image_path) { %>
+    <img src="<%= payment.slip_image_path %>" 
+         class="slip-thumbnail" 
+         onclick="openSlipModal('<%= payment.slip_image_path %>')" 
+         alt="slip">
+  <% } else { %> - <% } %>
+</td>
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+          </div>
+        
+      </div>
+    </main>
+  </div>
+    <!-- ดูสลิป -->
+  <!-- Modal แยกไว้ด้านล่างสุดของหน้า -->
+<div id="slipModal" class="modal" onclick="closeSlipModal(event)">
+  <div class="modal-box">
+    <span class="close" onclick="closeSlipModal()">&times;</span>
+    <img id="slipImage" class="modal-img" alt="slip">
+  </div>
+</div>
+
+  <script>
+  function openSlipModal(imageSrc) {
+    const modal = document.getElementById("slipModal");
+    const slipImage = document.getElementById("slipImage");
+    slipImage.src = imageSrc;
+    modal.style.display = "flex";
+  }
+
+  function closeSlipModal() {
+    document.getElementById("slipModal").style.display = "none";
+  }
+</script>
+
+
+</body>
+</html>

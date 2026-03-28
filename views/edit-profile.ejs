@@ -1,0 +1,270 @@
+<!DOCTYPE html> 
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ข้อมูลส่วนตัว</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR5DjCQ-QYlWbF3JxELa0bNTmDHmkc6zk&libraries=places&language=th&region=TH"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+      <div class="navbar-right">
+        <div class="profile-dropdown">
+          <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+          <div class="dropdown-menu">
+            <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="breadcrumb">
+      <a href="/">หน้าหลัก</a>
+      <i class="fas fa-angle-right"></i>
+      <a href="/edit-profile">แก้ไขข้อมูล</a>
+    </div>
+
+    <div class="profile-page">
+      <div class="profile-sidebar">
+        <h3>บัญชีของฉัน</h3>
+        <ul>
+          <li><a href="/edit-profile" class="active">ข้อมูลส่วนตัว</a></li>
+          <li><a href="/my-bookings">ประวัติการจอง</a></li>
+          <li><a href="/reviews">รีวิวของฉัน</a></li>
+        </ul>
+        <ul>
+          <li><a href="/logout" class="logout">ออกจากระบบ</a></li>
+        </ul>
+      </div>
+
+      <div class="edit-profile-content">
+        <form action="/edit-profile" method="POST">
+          <h1>ข้อมูลส่วนตัว</h1>
+
+          <h3 class="summary-title"><i class="fa fa-user"></i> ข้อมูลของท่าน</h3>
+          <div class="form-group two-fields">
+            <div class="field">
+              <label for="first_name">ชื่อ</label>
+              <input type="text" name="first_name" value="<%= user.first_name || '' %>" required>
+            </div>
+            <div class="field">
+              <label for="last_name">นามสกุล</label>
+              <input type="text" name="last_name" value="<%= user.last_name || '' %>" required>
+            </div>
+          </div>
+
+          <div class="form-group two-fields">
+            <div class="field">
+              <label for="phone">เบอร์โทรศัพท์</label>
+              <input type="text" name="phone" value="<%= user.phone || '' %>" required maxlength="10" oninput="validatePhone(this)">
+            </div>
+
+            <div class="field">
+              <label for="email">อีเมล</label>
+              <input type="email" name="email" value="<%= user.email %>" readonly>
+            </div>
+          </div>
+
+          
+
+          <h3 class="summary-title"><i class="fa fa-home"></i> ที่อยู่</h3>
+          <div class="form-group two-fields">
+            <div class="field">
+              <label for="house_number">บ้านเลขที่</label>
+              <input type="text" name="house_number" id="house_number" value="<%= user.house_number || '' %>">
+            </div>
+            <div class="field">
+              <label for="road">ซอย/ถนน</label>
+              <input type="text" name="road" id="road" value="<%= user.road || '' %>">
+            </div>
+          </div>
+
+          <div class="form-group two-fields">
+            <div class="field">
+              <label for="suburb">แขวง</label>
+              <input type="text" name="suburb" id="suburb" value="<%= user.suburb || '' %>">
+            </div>
+            <div class="field">
+              <label for="district">เขต</label>
+              <input type="text" name="district" id="district" value="<%= user.district || '' %>">
+            </div>
+          </div>
+
+          <div class="form-group two-fields">
+            <div class="field">
+              <label for="city">จังหวัด</label>
+              <input type="text" name="city" id="city" value="<%= user.city || '' %>">
+            </div>
+            <div class="field">
+              <label for="postcode">รหัสไปรษณีย์</label>
+              <input type="text" name="postcode" id="postcode" value="<%= user.postcode || '' %>">
+            </div>
+          </div>
+
+                  
+          <!-- ปุ่มเปิด popup -->
+          <div class="pin-box" id="btn-pin">
+            <span class="material-icons">place</span>
+            <h3>ปักหมุดเพื่อความแม่นยำ</h3>
+          </div>
+
+          <!-- Modal -->
+          <div id="mapModal" class="modal">
+            <div class="modal-content">
+              <span id="closePopup" class="close">&times;</span>
+              <h3>ปักหมุดเพื่อความแม่นยำ</h3>
+
+              <!-- กล่องค้นหาที่อยู่ -->
+              <input type="text" id="popup-search" placeholder="ระบุสถานที่" style="width:100%;padding:8px;margin-bottom:8px;">
+
+              <!-- แผนที่ -->
+              <div id="popup-map" style="height:400px; margin-bottom:10px;"></div>
+
+              <!--  ปุ่มไปยังตำแหน่งปัจจุบัน 
+              <button type="button" id="btn-current">ไปตำแหน่งปัจจุบัน</button>  -->
+              
+
+              <!-- ปุ่มยืนยัน -->
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="button" id="confirmLocation">ยืนยัน</button>
+              </div>
+
+              
+            </div>
+          </div>
+
+          <!-- hidden field -->
+          <input type="hidden" id="latitude" name="latitude" value="<%= user.latitude || '' %>">
+          <input type="hidden" id="longitude" name="longitude" value="<%= user.longitude || '' %>">
+
+          <label for="address">รายละเอียดที่อยู่ตามที่ปักหมุด</label>
+          <textarea name="address" readonly><%= user.address || '' %></textarea>
+
+
+          <button type="submit">บันทึกการเปลี่ยนแปลง</button>
+        </form>
+      </div>
+    </div>
+  </main>
+  
+<script>
+  let popupMap, popupMarker, popupAutocomplete;
+
+  document.getElementById('btn-pin').onclick = function() {
+    document.getElementById('mapModal').style.display = 'block';
+    setTimeout(initPopupMap, 200);
+  };
+
+  document.getElementById('closePopup').onclick = function() {
+    document.getElementById('mapModal').style.display = 'none';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == document.getElementById('mapModal')) {
+      document.getElementById('mapModal').style.display = 'none';
+    }
+  };
+
+  function initPopupMap() {
+    if (popupMap) return; // กันสร้างซ้ำ
+
+    popupMap = new google.maps.Map(document.getElementById('popup-map'), {
+      center: { lat: 13.736717, lng: 100.523186 },
+      zoom: 10
+    });
+
+    popupMarker = new google.maps.Marker({
+      map: popupMap,
+      draggable: true
+    });
+
+    // Autocomplete search
+    popupAutocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('popup-search')
+    );
+
+    popupAutocomplete.addListener('place_changed', function() {
+      const place = popupAutocomplete.getPlace();
+      if (!place.geometry) return;
+      popupMap.setCenter(place.geometry.location);
+      popupMap.setZoom(17);
+      popupMarker.setPosition(place.geometry.location);
+    });
+
+    // Confirm location
+    document.getElementById('confirmLocation').onclick = function() {
+      const pos = popupMarker.getPosition();
+      document.getElementById('latitude').value = pos.lat();
+      document.getElementById('longitude').value = pos.lng();
+
+      // ดึงที่อยู่จากตำแหน่งปักหมุด
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: pos }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+          document.querySelector('textarea[name="address"]').value = results[0].formatted_address;
+          console.log('ตำแหน่งปักหมุด:', results[0].formatted_address);
+        }
+      });
+
+      document.getElementById('mapModal').style.display = 'none';
+    };
+
+    // ตำแหน่งปัจจุบัน
+    document.getElementById('btn-current').onclick = function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          popupMap.setCenter(loc);
+          popupMap.setZoom(17);
+          popupMarker.setPosition(loc);
+        });
+      }
+    };
+    
+  }
+</script>
+
+
+<script>
+  // เบอร์โทร
+function validatePhone(input) {
+  // ให้พิมพ์เฉพาะตัวเลข
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  if (input.value.length === 10) {
+    const phone = input.value;
+
+    // ต้องขึ้นต้นด้วย 06, 08, 09 เท่านั้น
+    const validPattern = /^0(6|8|9)\d{8}$/;
+
+    // ต้องไม่ใช่เลขซ้ำทั้ง 10 ตัว เช่น 0000000000
+    const notRepeated = !/^(\d)\1{9}$/.test(phone);
+
+    if (!validPattern.test(phone) || !notRepeated) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
+      input.value = "";
+    }
+  }
+}
+</script>
+
+</body>
+</html>

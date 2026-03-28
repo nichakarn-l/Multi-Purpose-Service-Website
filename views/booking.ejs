@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8">
+    <title>จองบริการ: <%= service.name %></title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container">
+        <div class="navbar-left">
+          <a href="/" class="logo">
+            <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+          </a>
+        </div>
+        
+        <div class="navbar-right">
+          <div class="profile-dropdown">
+              <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+              <div class="dropdown-menu">
+                <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+              </div>
+            </div>
+        </div>
+      </div>
+    </header>
+
+  <main class="container">
+    <div class="stepper">
+      <!-- Step 1 -->
+      <div class="step <%= currentStep >= 1 ? 'active' : '' %>">
+          <div class="circle">1</div>
+          <div class="label">จองบริการ</div>
+      </div>
+
+      <!-- Line 1 -->
+      <div class="line <%= currentStep > 1 ? 'active' : '' %>"></div>
+
+      <!-- Step 2 -->
+      <div class="step <%= currentStep >= 2 ? 'active' : '' %>">
+          <div class="circle">2</div>
+          <div class="label">สรุปการจอง</div>
+      </div>
+
+      <!-- Line 2 -->
+      <div class="line <%= currentStep > 2 ? 'active' : '' %>"></div>
+
+      <!-- Step 3 -->
+      <div class="step <%= currentStep >= 3 ? 'active' : '' %>">
+          <div class="circle">3</div>
+          <div class="label">ชำระเงิน</div>
+      </div>
+    </div>
+
+      <div class="booking-layout">
+
+        <div class="booking-left">
+          
+          <img src="<%= service.image_path %>" alt="<%= service.name %>">
+
+          <div class="booking-detail">
+            <p><strong>รายละเอียดของบริการ</strong></p>
+            <div class="service-description">
+              <ul>
+                <% service.description.split('\n').forEach(line => { %>
+                  <% if (line.trim()) { %>
+                    <li><%= line.trim().replace(/^•\s*/, '') %></li>
+                  <% } %>
+                <% }) %>
+              </ul>
+            </div>
+          </div>
+
+
+          <!--รายละเอียดการทำงาน!-->
+          <div class="booking-detail">
+            <h3><i class="fa-solid fa-file-lines"></i> รายละเอียดเพิ่มเติม</h3>
+            <div class="accordion">
+
+              <div class="accordion-item">
+                <button class="accordion-header">รายละเอียดการบริการ</button>
+                <div class="accordion-content">
+                  <ul>
+                    <% service.service_details.split('\n').forEach(area => { %>
+                      <li><%= area.trim() %></li>
+                    <% }) %>
+                  </ul>
+
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <button class="accordion-header">พื้นที่ให้บริการ</button>
+                <div class="accordion-content">
+                  <ul>
+                    <% service.service_area.split(',').forEach(area => { %>
+                      <li><%= area.trim() %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <button class="accordion-header">ขั้นตอนการทำงาน</button>
+                <div class="accordion-content">
+                  <ul>
+                    <% service.workflow.split('\n').forEach(area => { %>
+                      <li><%= area.trim() %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <button class="accordion-header">เงื่อนไขการรับประกัน</button>
+                <div class="accordion-content">
+                  <ul>
+                    <% service.warranty_conditions.split('\n').forEach(area => { %>
+                      <li><%= area.trim() %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-right">
+          <h1><%= service.name %></h1>
+
+          <div class="price-section">
+            <p style="font-size: 24px; font-weight: bold; color: red;"><strong>ราคา </strong> <%= Number(service.base_price).toLocaleString('th-TH') %> บาท</p>
+            <br>
+
+            <div class="quantity-container">
+              <label for="point_count" class="quantity-label">จำนวน</label>
+              <div class="quantity-controls">
+                <button type="button" id="decrease" class="quantity-btn"><i class="fa-solid fa-minus"></i></button>
+                <input type="number" id="point_count" name="point_count" min="1"
+                  value="<%= booking ? booking.point_count : 1 %>" required>
+                <button type="button" id="increase" class="quantity-btn"><i class="fa-solid fa-plus"></i></button>
+              </div>
+            </div>
+
+
+
+            <p class="total-price">
+              ยอดชำระทั้งหมด&nbsp;&nbsp;<span id="total_price"> <%= service.base_price %> </span>&nbsp;บาท
+            </p>
+          </div>
+
+          <% if (!canBook) { %>
+            <div style="margin-top: 20px; padding: 15px; background: #ffe6e6; border-radius: 10px; color: #b30000; font-weight: bold; text-align: center;" >
+                ขณะนี้ยังไม่มีช่างที่พร้อมให้บริการสำหรับงานนี้<br>
+                กรุณาเลือกบริการอื่น
+              </div>
+
+              <div class="booking-button-group" style="margin-top: 20px;">
+                <a href="/services/<%= categoryId %>" class="booking-btn">กลับไปเลือกบริการ</a>
+              </div>
+
+            <% } else { %>
+
+              <form action="/booking<%= booking ? ('/edit/' + booking.id) : '' %>" method="POST">
+                <input type="hidden" name="service_id" value="<%= service.id %>">
+                
+                <label for="booking_date_display">เลือกวันที่จอง:</label>
+                <input type="text" id="booking_date_display" required placeholder="วัน/เดือน/ปี"> <!-- สำหรับแสดง Flatpickr -->
+                <input type="hidden" id="booking_date" name="booking_date"> <!-- สำหรับส่ง server -->
+
+
+
+                <label for="booking_time">เลือกเวลาจอง:</label>
+                <select id="booking_time" name="booking_time" required>
+                  <option value="">-- กรุณาเลือกเวลา --</option>
+                </select>
+
+
+                <input type="hidden" id="final_price" name="final_price" value="">
+                <input type="hidden" id="hidden_point_count" name="point_count" value="">
+
+                <div class="booking-button-group">
+                  <% if (booking) { %>
+                    <a href="/cancel-booking/<%= booking.id %>" class="booking-btn">ย้อนกลับ</a>
+                  <% } else { %>
+                    <a href="/services/<%= categoryId %>" class="booking-btn">ย้อนกลับ</a>
+                  <% } %>
+                  <button type="submit" class="booking-submit">ดำเนินการต่อ</button>
+                </div>
+
+              </form>
+            <% } %>
+        </div>
+
+    </div>
+  </main>
+
+  <!-- JSON data จาก server -->
+  <script type="application/json" id="options_data">
+    <%- JSON.stringify(options) %>
+  </script>
+
+  <script type="application/json" id="booking_data">
+    <%- JSON.stringify(booking || null) %>
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+<script>
+  const optionsData = JSON.parse(document.getElementById('options_data').textContent);
+  const bookingData = JSON.parse(document.getElementById('booking_data').textContent);
+  const basePrice = <%= service && service.base_price ? service.base_price : 0 %>;
+
+  const pointCountInput = document.getElementById('point_count');
+  const totalPriceSpan = document.getElementById('total_price');
+  const finalPriceInput = document.getElementById('final_price');
+  const hiddenPointInput = document.getElementById("hidden_point_count");
+  const form = document.querySelector(".booking-right form");
+  const bookingDateDisplay = document.getElementById('booking_date_display');
+  const bookingDateHidden = document.getElementById('booking_date');
+  const bookingTimeSelect = document.getElementById('booking_time');
+  const serviceId = <%= service.id %>;
+  const bookingTimeFromServer = "<%= booking ? booking.booking_time : '' %>";
+  const canBook = <%= canBook ? 'true' : 'false' %>;
+
+  // ปิดฟอร์มถ้าไม่มีช่าง active
+  if (!canBook) {
+    form.querySelectorAll('input, select, button').forEach(el => el.disabled = true);
+    const noTechMsg = document.createElement('p');
+    noTechMsg.style.color = 'red';
+    noTechMsg.textContent = 'ไม่มีช่างว่างสำหรับบริการนี้';
+    form.parentNode.insertBefore(noTechMsg, form);
+  }
+
+  function updateTotalPrice() {
+    const pointCount = parseInt(pointCountInput.value) || 1;
+    let total = 0;
+
+    if (!optionsData || optionsData.length === 0) {
+      total = pointCount * basePrice;
+    } else if (optionsData.length === 1) {
+      total = pointCount * parseFloat(optionsData[0].option_price);
+    } else if (optionsData.length >= 2) {
+      const firstPointPrice = parseFloat(optionsData[0].option_price);
+      const additionalPointPrice = parseFloat(optionsData[1].option_price);
+      total = (firstPointPrice === additionalPointPrice)
+        ? pointCount * firstPointPrice
+        : (pointCount === 1 ? firstPointPrice : firstPointPrice + (pointCount - 1) * additionalPointPrice);
+    } else {
+      totalPriceSpan.textContent = "ข้อมูลราคาไม่ครบ";
+      return;
+    }
+
+    totalPriceSpan.textContent = total.toLocaleString('th-TH'); 
+    finalPriceInput.value = total.toFixed(2);
+  }
+
+  if (bookingData && bookingData.point_count) {
+    pointCountInput.value = bookingData.point_count;
+  }
+  updateTotalPrice();
+  pointCountInput.addEventListener('input', updateTotalPrice);
+
+  form.addEventListener("submit", function() {
+    hiddenPointInput.value = pointCountInput.value;
+    finalPriceInput.value = totalPriceSpan.textContent;
+  });
+
+
+  //การเลือกวัน Flatpickr สำหรับเลือกวัน
+  flatpickr(bookingDateDisplay, {
+    locale: "th",
+    dateFormat: "d/m/Y",
+    minDate: "today",
+    maxDate: new Date().fp_incr(30),
+
+    defaultDate: bookingData && bookingData.booking_date ? (() => {
+      const parts = bookingData.booking_date.split('-');
+      return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    })() : null,
+
+    // แสดงเดือนเป็นไทย
+    formatDate: function(date) {
+      const dd = date.getDate();
+      const monthNames = [
+        "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+      ];
+      const monthName = monthNames[date.getMonth()];
+      const yyyy = date.getFullYear() + 543;
+      return `${dd} ${monthName} ${yyyy}`;
+    },
+
+    
+    // แปลง string เป็น Date
+    parseDate: function(dateStr) {
+      if (!dateStr) return null;
+      const monthNames = [
+        "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+        "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+      ];
+      const parts = dateStr.split(' ');
+      const dd = parseInt(parts[0], 10);
+      const mm = monthNames.indexOf(parts[1]);
+      const yyyy = parseInt(parts[2], 10) - 543;
+      return new Date(yyyy, mm, dd);
+    },
+
+
+    onChange: function(selectedDates) {
+      if (!canBook) return;
+      if (selectedDates.length > 0) {
+        const yyyy = selectedDates[0].getFullYear();
+        const mm = String(selectedDates[0].getMonth() + 1).padStart(2, '0');
+        const dd = String(selectedDates[0].getDate()).padStart(2, '0');
+        const isoDate = `${yyyy}-${mm}-${dd}`;
+        bookingDateHidden.value = isoDate;
+        fetchAvailableTimes(isoDate);
+      }
+    }
+  });
+
+  if (bookingData && bookingData.booking_date) {
+    bookingDateHidden.value = bookingData.booking_date;  
+  }
+
+  //ฟังก์ชันดึงเวลาว่างจาก server
+  async function fetchAvailableTimes(date) {
+    if (!canBook) return;
+    if (!date) return;
+    try {
+      //เรียก API จาก server
+      const response = await fetch(`/available-times?date=${date}&service_id=${serviceId}`);
+      if (!response.ok) throw new Error('Error fetching times');
+
+      const times = await response.json();
+      bookingTimeSelect.innerHTML = '<option value="">-- กรุณาเลือกเวลา --</option>';
+
+
+      //ตรวจสอบวันที่เป็นวันนี้หรือไม่  ใช้เพื่อ disable เวลาที่ผ่านมาแล้ว ถ้าเลือกวันวันนี้
+      const now = new Date();
+      const selectedDate = new Date(date);
+      const isToday = selectedDate.toDateString() === now.toDateString();
+
+      times.forEach(({ time, booked }) => {
+        const option = document.createElement('option');
+        option.value = time;
+        option.textContent = time;
+
+        //ตรวจสอบว่าช่วงเวลาเต็ม
+        if (booked) {
+          option.disabled = true;
+          option.style.color = 'gray';
+          option.textContent += ' (เต็มแล้ว)';
+        }
+
+        //ตรวจสอบถ้าวันนี้ -> ปิดเวลาที่ผ่านมาแล้ว
+        if (isToday) {
+          const [h, m] = time.split(':').map(Number);
+          const timeMinutes = h * 60 + m;
+          const currentMinutes = now.getHours() * 60 + now.getMinutes();
+          if (timeMinutes <= currentMinutes) {
+            option.disabled = true;
+            option.style.color = 'gray';
+          }
+        }
+
+        bookingTimeSelect.appendChild(option);
+      });
+
+      if (bookingTimeFromServer) {
+        bookingTimeSelect.value = bookingTimeFromServer;
+      }
+
+    } catch (error) {
+      console.error('Error fetching available times:', error);
+    }
+  }
+
+  if (bookingData && bookingData.booking_date) {
+    fetchAvailableTimes(bookingData.booking_date);
+  }
+</script>
+
+
+<script>
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const content = header.nextElementSibling;
+
+    if (item.classList.contains('active')) {
+      content.style.height = '0';
+      item.classList.remove('active');
+    } else {
+      content.style.height = content.scrollHeight + 'px';
+      item.classList.add('active');
+    }
+  });
+});
+</script>
+
+<script>
+  // ปุ่มเพิ่ม/ลดจำนวนจุด
+  const decreaseBtn = document.getElementById('decrease');
+  const increaseBtn = document.getElementById('increase');
+
+  decreaseBtn.addEventListener('click', () => {
+    let value = parseInt(pointCountInput.value) || 1;
+    if (value > 1) {
+      pointCountInput.value = value - 1;
+      updateTotalPrice();
+    }
+  });
+
+  increaseBtn.addEventListener('click', () => {
+    let value = parseInt(pointCountInput.value) || 1;
+    pointCountInput.value = value + 1;
+    updateTotalPrice();
+  });
+</script>
+
+
+</body>
+</html>

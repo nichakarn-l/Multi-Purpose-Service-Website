@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>จัดการบริการ</title>
+  <link rel="stylesheet" href="/styles/index_admin.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+          <h1>จัดการบริการ</h1>
+          <a href="/admin/services/add" class="btn-add">
+              <i class="material-icons">add</i> เพิ่มบริการ
+          </a>
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">ลำดับที่</th>
+                <th>ชื่อบริการ</th>
+                <th>หมวดหมู่</th>
+                <th>ราคา</th>
+                <th>ระยะเวลาการทำงาน</th>
+                <th>รูปภาพ</th>
+                <th>สถานะ</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if (services.length > 0) { %>
+                <% services.forEach(service => { %>
+                  <tr>
+                    <td><%= service.id %></td>
+                    <td><%= service.name %></td>
+                    <td><%= service.category_name || '-' %></td>
+                    <td><%= service.base_price !== null && service.base_price !== undefined 
+                      ? Number(service.base_price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' บาท/จุด' : '-' %></td>
+                    <td>
+                      <% if (service.duration) { 
+                          const h = service.duration.hours || 0;
+                          const m = service.duration.minutes || 0;
+
+                          let displayTime = "";
+                          if (h > 0) displayTime += h + " ชั่วโมง ";
+                          if (m > 0) displayTime += m + " นาที";
+                          if (h === 0 && m === 0) displayTime = "-";
+                      %>
+                        <%= displayTime.trim() %>
+                      <% } else { %>
+                        -
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <% if(service.image_path){ %>
+                        <img src="<%= service.image_path %>" alt="service image" style="height:50px;">
+                      <% } else { %>
+                        ไม่มีภาพ
+                      <% } %>
+                    </td>
+                    
+                    <td>
+                      <% if (service.is_active) { %>
+                          <span style="color: green;">เปิดใช้งาน</span>
+                      <% } else { %>
+                          <span style="color: red;">ปิดการใช้งาน</span>
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <div class="btn-group">
+                        <a href="/admin/services/edit/<%= service.id %>" class="btn-edit">แก้ไข</a>
+
+                        <% if (service.is_active) { %>
+                          <button class="btn-deactivate" onclick="deactivateService(<%= service.id %>)">
+                            ปิดการใช้งาน
+                          </button>
+                        <% } else { %>
+                          <button class="btn-restore" onclick="activateService(<%= service.id %>)">
+                            เปิดการใช้งาน
+                          </button>
+                        <% } %>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="8">ไม่พบข้อมูลบริการ</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+  async function deactivateService(id) {
+  if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการปิดการใช้งานบริการนี้?')) return;
+
+  const res = await fetch(`/admin/services/deactivate/${id}`, { method: 'POST' });
+
+  if (res.ok) {
+    alert('ปิดการใช้งานสำเร็จ');
+    location.reload();
+  } else {
+    alert('เกิดข้อผิดพลาด');
+  }
+}
+
+async function activateService(id) {
+  if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการเปิดการใช้งานบริการนี้?')) return;
+
+  const res = await fetch(`/admin/services/activate/${id}`, { method: 'POST' });
+
+  if (res.ok) {
+    alert('เปิดการใช้งานสำเร็จ');
+    location.reload();
+  } else {
+    alert('เกิดข้อผิดพลาด');
+  }
+}
+
+</script>
+</body>
+</html>

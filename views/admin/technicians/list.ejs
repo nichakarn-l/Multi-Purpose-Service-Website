@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบจัดการฐานข้อมูลช่าง</title>
+  <link rel="stylesheet" href="/styles/index_admin.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+          <h1>ระบบจัดการฐานข้อมูลช่าง</h1>
+            <a href="/admin/technicians/add" class="btn-add">
+              <i class="material-icons">add</i> เพิ่มช่าง
+            </a>
+            
+            <table class="tech-table">
+              <thead>
+                <tr>
+                  <th>รหัสพนักงาน</th>
+                  <th>ชื่อ</th>
+                  <th>นามสกุล</th>
+                  <th>ตำแหน่ง</th>
+                  <th>วันที่เริ่มงาน</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% technicians.forEach(t => { %>
+                  <tr>
+                    <td><%= t.id %></td>
+                    <td><%= t.first_name %></td>
+                    <td><%= t.last_name %></td>
+                    <td><%= t.category_name || '-' %></td>
+
+                    <td>
+                      <%= t.start_date
+                        ? new Date(t.start_date).toLocaleDateString('th-TH', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: '2-digit'
+                          })
+                        : '-' 
+                      %>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <a href="/admin/technicians/edit/<%= t.id %>" class="btn-edit">แก้ไข</a>
+                        <button class="btn-deactivate" data-id="<%= t.id %>">ปิดการใช้งาน</button>
+                      </div>
+                      
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+      </div>
+      
+
+    </main>
+  </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.btn-deactivate').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.dataset.id;
+
+      if (!confirm('ต้องการปิดการใช้งานช่างคนนี้หรือไม่?')) return;
+
+      fetch(`/admin/technicians/deactivate/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(async res => {
+        const msg = await res.text(); // อ่านข้อความจาก server
+
+        if (res.ok) {
+          alert('ปิดการใช้งานเรียบร้อยแล้ว');
+          location.reload();
+        } else {
+          alert(msg || 'เกิดข้อผิดพลาดในการปิดการใช้งาน');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('ปิดการใช้งานไม่สำเร็จ');
+      });
+    });
+  });
+});
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<!-- ภาษาไทย -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+<script>
+  flatpickr("input[name='start_date']", {
+    dateFormat: "d/m/Y",
+    locale: "th"
+  });
+</script>
+
+</body>
+</html>

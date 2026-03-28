@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ชำระเงิน</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+      <div class="navbar-right">
+        <div class="profile-dropdown">
+            <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+            <div class="dropdown-menu">
+              <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="stepper">
+      <!-- Step 1 -->
+      <div class="step <%= currentStep >= 1 ? 'active' : '' %>">
+          <div class="circle">1</div>
+          <div class="label">จองบริการ</div>
+      </div>
+
+      <!-- Line 1 -->
+      <div class="line <%= currentStep > 1 ? 'active' : '' %>"></div>
+
+      <!-- Step 2 -->
+      <div class="step <%= currentStep >= 2 ? 'active' : '' %>">
+          <div class="circle">2</div>
+          <div class="label">สรุปการจอง</div>
+      </div>
+
+      <!-- Line 2 -->
+      <div class="line <%= currentStep > 2 ? 'active' : '' %>"></div>
+
+      <!-- Step 3 -->
+      <div class="step <%= currentStep >= 3 ? 'active' : '' %>">
+          <div class="circle">3</div>
+          <div class="label">ชำระเงิน</div>
+      </div>
+    </div>
+
+
+    <div class="payment-container">
+      <h1>ชำค่าบริการล่วงหน้า</h1>
+
+      <!--<p>ค่าบริการทั้งหมด: <%= booking.total_price %> บาท</p>!-->
+      
+      <form action="/payment" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="booking_id" value="<%= booking.id %>">
+        <input type="hidden" name="payment_method" value="promptpay">
+
+        <label>สแกนชำระผ่าน PromptPay</label>
+        <div class="qr-image">
+          <img src="/images/pay/QR-Code.jpg" alt="QR Code">
+        </div>
+
+        <p style="text-align: center; font-size: 18px;">ยอดเงินจองบริการ: <strong><%= Number(booking.deposit_amount || 0).toFixed(2) %> บาท</strong></p>
+        <input type="hidden" name="amount" value="<%= Number(booking.deposit_amount || 0).toFixed(2) %>">
+
+        <div class="custom-upload">
+          <input type="file" id="slipUpload" name="slip_image_path" accept="image/*" required onchange="showFilePreview(event)">
+          <label for="slipUpload">
+            <div class="upload-box" id="uploadBoxText">
+              หลักฐานการชำระเงิน
+            </div>
+          </label>
+        </div>
+
+        <div class="btn-group">
+          <a href="/booking_summary/<%= booking.id %>" class="btn-back">ย้อนกลับ</a>
+          <button type="submit">ยืนยันการจอง</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script>
+      function showFilePreview(event) {
+        const file = event.target.files[0];
+        const uploadBoxText = document.getElementById('uploadBoxText');
+
+        if (file) {
+          uploadBoxText.innerHTML = `<i class="fa fa-file"></i> ${file.name}`;
+        } else {
+          uploadBoxText.innerHTML = 'หลักฐานการชำระเงิน';
+        }
+      }
+  </script>
+</body>
+</html>

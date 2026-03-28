@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>แก้ไขข้อมูลช่าง</title>
+    <link rel="stylesheet" href="/styles/index_admin.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  </head>
+  <body>
+    <header class="top-navbar">
+      <div class="left-section">
+        <span class="material-icons menu-icon">menu</span>
+        <a href="/admin/dashboard" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+        </a>
+      </div>
+      
+    </header>
+    <div class="container">
+      <aside class="sidebar">
+        <nav>
+          <ul>
+            <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+              <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+            </li>
+            <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+              <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+            </li>
+            <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+              <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+            </li>
+            <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+              <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+            </li>
+            <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+              <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+            </li>
+            <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+              <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+            </li>
+            <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+              <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+            </li>
+            <li>
+              <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="main-content">
+        <div class="content">
+          <div class="list-card">
+            <div class="page-header">
+              <h2>แก้ไขข้อมูลพนักงานช่าง</h2>
+            </div>
+              
+              <form action="/admin/technicians/edit/<%= technician.id %>" method="POST" enctype="multipart/form-data" class="technician-form">
+                <div class="technician-form-container">
+
+                  <!-- รูป -->
+                  <div class="technician-form-photo">
+                    <label for="photoInput" class="technician-form-photo-box" id="photoPreview"
+                      style="background-image: url('<%= technician.photo || "" %>'); background-size: cover; background-position: center;">
+                      <%= technician.photo ? '' : 'คลิกเพื่อเลือกรูป' %>
+                    </label>
+                    <input type="file" id="photoInput" name="photo" accept="image/*" hidden>
+                    <input type="hidden" name="old_photo" value="<%= technician.photo %>">
+                  </div>
+
+                  <!-- ข้อมูลส่วนตัว -->
+                  <div class="technician-form-fields">
+
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>คำนำหน้า</label>
+                        <select name="prefix" required>
+                          <option value="">-- เลือกคำนำหน้า --</option>
+                          <option value="นาย" <%= technician.prefix==='นาย'?'selected':'' %>>นาย</option>
+                          <option value="นาง" <%= technician.prefix==='นาง'?'selected':'' %>>นาง</option>
+                          <option value="นางสาว" <%= technician.prefix==='นางสาว'?'selected':'' %>>นางสาว</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>ชื่อ</label>
+                        <input type="text" name="first_name" value="<%= technician.first_name %>" required>
+                      </div>
+                      <div class="technician-form-group">
+                        <label>นามสกุล</label>
+                        <input type="text" name="last_name" value="<%= technician.last_name %>" required>
+                      </div>
+                    </div>
+
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>วัน-เดือน-ปีเกิด</label>
+                        <input type="text" id="birth_date" name="birth_date" value="<%= technician.birth_date || '' %>">
+                      </div>
+                    </div>
+
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>เบอร์โทร</label>
+                        <input type="text" name="phone" value="<%= technician.phone %>" maxlength="10" oninput="validatePhone(this)">
+                      </div>
+                      <div class="technician-form-group">
+                        <label>อีเมล</label>
+                        <input type="email" name="email" value="<%= technician.email %>" required>
+                      </div>
+                    </div>
+
+                    <div class="technician-form-row"> 
+                      <div class="technician-form-group">
+                        <label>ที่อยู่</label>
+                        <textarea name="address" rows="3" placeholder="ที่อยู่"><%= technician.address %></textarea>
+                      </div>
+                    </div>
+
+
+                    <h3>การทำงาน</h3>
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>แผนก</label>
+                        <select name="category_id" id="category_id" required>
+                          <% categories.forEach(cat => { %>
+                            <option value="<%= cat.id %>" <%= cat.id===technician.category_id?'selected':'' %>><%= cat.name %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+
+                      <div class="technician-form-group">
+                        <label>วัน-เดือน-ปีที่เข้าทำงาน</label>
+                        <input type="text" id="start_date" name="start_date" value="<%= technician.start_date || '' %>">
+                      </div>
+                    </div>
+
+                    <div class="technician-form-row">
+                      <div class="technician-form-group">
+                        <label>บริการที่ช่างสามารถทำได้</label>
+                        <div class="service-grid">
+                          <% services.forEach(service => { %>
+                            <label class="service-option service-item" data-category="<%= service.service_category_id %>">
+                              <input type="checkbox" name="service_ids[]" value="<%= service.id %>"
+                                <%= technician.service_ids.includes(service.id)?'checked':'' %>>
+                              <span><%= service.name %></span>
+                            </label>
+                          <% }) %>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="technician-btn-group">
+                      <button type="submit" class="technician-btn-submit">บันทึกการแก้ไข</button>
+                    </div>
+
+                  </div>
+                </div>
+              </form>
+          </div>
+        </div>
+     </main>
+  </div>
+  <!-- Flatpickr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const categorySelect = document.getElementById('category_id');
+      const serviceItems = document.querySelectorAll('.service-item');
+
+      function filterServicesByCategory(categoryId) {
+        serviceItems.forEach(item => {
+          if (item.dataset.category === categoryId) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+            item.querySelector('input[type="checkbox"]').checked = false;
+          }
+        });
+      }
+
+      filterServicesByCategory(categorySelect.value);
+
+      categorySelect.addEventListener('change', function () {
+        filterServicesByCategory(this.value);
+      });
+
+      // รูป preview
+      const photoInput = document.getElementById('photoInput');
+      const photoPreview = document.getElementById('photoPreview');
+
+      photoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            photoPreview.style.backgroundImage = `url(${e.target.result})`;
+            photoPreview.textContent = '';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Flatpickr
+      function convertToThaiYear(dateObj) {
+        const day = dateObj.getDate();
+        const month = dateObj.toLocaleString('th-TH', { month: 'long' });
+        const year = dateObj.getFullYear() + 543; // แปลงเป็น พ.ศ.
+        return `${day} ${month} ${year}`;
+      }
+
+      flatpickr("#birth_date", {
+        locale: "th",
+        altInput: true,
+        altFormat: "j F Y",  // แสดงแบบเต็ม เช่น 20 กุมภาพันธ์ 2568
+        dateFormat: "Y-m-d", // ส่งไปเซิร์ฟเวอร์เป็น YYYY-MM-DD
+        maxDate: "today",
+        defaultDate: "<%= technician.birth_date_iso %>", // ตัวแปรจาก server
+        onReady: function(selectedDates, dateStr, instance) {
+          if(selectedDates.length > 0){
+            instance.altInput.value = convertToThaiYear(selectedDates[0]);
+          }
+        },
+        onChange: function(selectedDates, dateStr, instance) {
+          if(selectedDates.length > 0){
+            instance.altInput.value = convertToThaiYear(selectedDates[0]);
+          }
+        }
+      });
+
+      flatpickr("#start_date", {
+        locale: "th",
+        altInput: true,
+        altFormat: "j F Y",
+        dateFormat: "Y-m-d",
+        maxDate: "today",
+        defaultDate: "<%= technician.start_date_iso %>",
+        onReady: function(selectedDates, dateStr, instance) {
+          if(selectedDates.length > 0){
+            instance.altInput.value = convertToThaiYear(selectedDates[0]);
+          }
+        },
+        onChange: function(selectedDates, dateStr, instance) {
+          if(selectedDates.length > 0){
+            instance.altInput.value = convertToThaiYear(selectedDates[0]);
+          }
+        }
+      });
+    });
+  </script>
+
+  <script>
+  // เบอร์โทร
+function validatePhone(input) {
+  // ให้พิมพ์เฉพาะตัวเลข
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  if (input.value.length === 10) {
+    const phone = input.value;
+
+    // ต้องขึ้นต้นด้วย 06, 08, 09 เท่านั้น
+    const validPattern = /^0(6|8|9)\d{8}$/;
+
+    // ต้องไม่ใช่เลขซ้ำทั้ง 10 ตัว เช่น 0000000000
+    const notRepeated = !/^(\d)\1{9}$/.test(phone);
+
+    if (!validPattern.test(phone) || !notRepeated) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
+      input.value = "";
+    }
+  }
+}
+</script>
+
+
+  </body>
+</html>

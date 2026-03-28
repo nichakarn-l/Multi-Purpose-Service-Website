@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>บริการในหมวดนี้</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-left">
+        <a href="/" class="logo">
+          <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+        </a>
+      </div>
+
+      <div class="navbar-center">
+        <form action="/service" method="GET">
+          <input 
+            type="text" 
+            name="search" 
+            placeholder="ค้นหางานช่างที่ต้องการ..." 
+            class="search-bar"
+          >
+        </form>
+      </div>
+
+      <div class="navbar-right">
+        <% if (user) { %>
+        <!-- ถ้า login แล้ว -->
+          <div class="profile-dropdown">
+            <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+            <div class="dropdown-menu">
+              <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+            </div>
+          </div>
+
+        <% } else { %>
+        <!-- ยังไม่ได้ login -->
+          <a href="/login" class="login-btn">เข้าสู่ระบบ</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="breadcrumb">
+      <a href="/">หน้าหลัก</a>
+      <i class="fas fa-angle-right"></i>
+      <a href="/services/<%= categoryId %>"><%= categoryName %></a>
+    </div>
+
+    <h1>บริการในหมวดนี้</h1>
+    <div class="services">
+        <% if (services.length === 0) { %>
+            <p>ยังไม่มีบริการในหมวดนี้</p>
+        <% } else { %>
+            <% services.forEach(service => { %>
+            <div class="service-card">
+                <img src="<%= service.image_path %>" alt="<%= service.name %>" class="service-image">
+                <h3><%= service.name %></h3>
+                <!--<p><%= service.description %></p>!-->
+                <p><strong><%= Number(service.base_price).toLocaleString('th-TH') %> บาท</strong>/จุด</p>
+
+                <a href="/service/<%= service.id %>" class="btn-book">ดูรายละเอียด</a>
+
+            </div>
+            <% }) %>
+        <% } %>
+    </div>
+  </main>
+</body>
+</html>

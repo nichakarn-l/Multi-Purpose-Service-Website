@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8">
+    <title>จองบริการ: <%= service.name %></title>
+    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR5DjCQ-QYlWbF3JxELa0bNTmDHmkc6zk&libraries=places&language=th&region=TH"></script>
+
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="container">
+        <div class="navbar-left">
+          <a href="/" class="logo">
+            <img src="/images/logo.png" alt="HandyX Logo" class="logo">
+          </a>
+        </div>
+        
+        <div class="navbar-right">
+          <div class="profile-dropdown">
+              <img src="/images/profile.png" alt="Profile" class="icon profile-icon">
+              <div class="dropdown-menu">
+                <a href="/edit-profile">ข้อมูลส่วนตัว</a>
+              <a href="/my-bookings">ประวัติการจอง</a>
+              <a href="/reviews">รีวิวของฉัน</a>
+              <a href="/logout">ออกจากระบบ</a>
+              </div>
+            </div>
+        </div>
+      </div>
+    </header>
+    
+    <main class="container">
+        <div class="stepper">
+            <!-- Step 1 -->
+            <div class="step <%= currentStep >= 1 ? 'active' : '' %>">
+                <div class="circle">1</div>
+                <div class="label">จองบริการ</div>
+            </div>
+
+            <!-- Line 1 -->
+            <div class="line <%= currentStep > 1 ? 'active' : '' %>"></div>
+
+            <!-- Step 2 -->
+            <div class="step <%= currentStep >= 2 ? 'active' : '' %>">
+                <div class="circle">2</div>
+                <div class="label">สรุปการจอง</div>
+            </div>
+
+            <!-- Line 2 -->
+            <div class="line <%= currentStep > 2 ? 'active' : '' %>"></div>
+
+            <!-- Step 3 -->
+            <div class="step <%= currentStep >= 3 ? 'active' : '' %>">
+                <div class="circle">3</div>
+                <div class="label">ชำระเงิน</div>
+            </div>
+        </div>
+
+        <div class="booking-summary-container">
+            <div class="summary-left"> 
+                <form id="update-address-form" method="POST" action="/booking_summary/<%= booking.booking_id %>">
+                    <!-- ข้อมูลของท่าน -->
+                    <div class="summary-card">
+                    <h3><i class="fa fa-user"></i> ข้อมูลของท่าน</h3>
+                    <div class="form-group">
+                        <label class="booking-summary-label">ชื่อ</label>
+                        <input type="text" class="booking-summary-input" name="first_name" value="<%= booking.user_first_name || '' %>" required>
+
+                        <label class="booking-summary-label">นามสกุล</label>
+                        <input type="text" class="booking-summary-input" name="last_name" value="<%= booking.user_last_name || '' %>" required>
+
+                        <label class="booking-summary-label">อีเมล</label>
+                        <input type="text" class="booking-summary-input" name="email" value="<%= booking.user_email || '' %>" readonly>
+
+                        <label class="booking-summary-label">เบอร์โทรศัพท์</label>
+                        <input type="text" class="booking-summary-input" name="phone" value="<%= booking.user_phone || '' %>" maxlength="10" oninput="validatePhone(this)" required>
+
+                    </div>
+                    </div>
+
+                    <!-- ที่อยู่หน้างาน -->
+                    <div class="summary-card">
+                    <h3><i class="fa fa-home"></i> ที่อยู่</h3>
+                    
+                    <input type="hidden" name="latitude" id="latitude" value="<%= booking.user_latitude || '' %>">
+                    <input type="hidden" name="longitude" id="longitude" value="<%= booking.user_longitude || '' %>">
+
+                    <div class="form-group">
+                        <div class="form-group two-fields">
+                          <div class="field">
+                            <label class="booking-summary-label">บ้านเลขที่</label>
+                            <input type="text" class="booking-summary-input" name="house_number" value="<%= booking.user_house_number || '' %>" required>
+                          </div>
+
+                          <div class="field">
+                            <label class="booking-summary-label">ซอย/ถนน</label>
+                            <input type="text" class="booking-summary-input" name="road" value="<%= booking.user_road || '' %>" required>
+                          </div>
+                        </div>
+
+                        <div class="form-group two-fields">
+                          <div class="field">
+                            <label class="booking-summary-label">ตำบล/แขวง</label>
+                            <input type="text" class="booking-summary-input" name="suburb" value="<%= booking.user_suburb || '' %>" required>
+                          </div>
+
+                          <div class="field">
+                            <label class="booking-summary-label">อำเภอ/เขต</label>
+                            <input type="text" class="booking-summary-input" name="district" value="<%= booking.user_district || '' %>" required>
+                          </div>
+                        </div>
+
+                        <div class="form-group two-fields">
+                          <div class="field">
+                            <label class="booking-summary-label">จังหวัด</label>
+                            <input type="text" class="booking-summary-input" name="city" value="<%= booking.user_city || '' %>" required>
+                          </div>
+
+                          <div class="field">
+                            <label class="booking-summary-label">รหัสไปรษณีย์</label>
+                            <input type="text" class="booking-summary-input" name="postcode" value="<%= booking.user_postcode || '' %>" required>
+                          </div>
+                        </div>
+
+                        <label class="booking-summary-label">ตำแหน่งบนแผนที่</label>
+                        <input type="text" id="popup-search" placeholder="ค้นหาสถานที่" class="booking-summary-input">
+                        <div id="popup-map" style="width:100%;height:400px;border-radius:8px;margin-bottom:10px;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="booking-summary-label">รายละเอียดที่อยู่ตามที่ปักหมุด</label>
+                        <textarea name="address" readonly class="readonly-textarea"><%= booking.user_address || '' %></textarea>
+                    </div>
+
+                    <div class="btn-container">
+                        <button class="btn-save">บันทึก</button>
+                    </div>
+                    </div>
+
+                    <input type="hidden" id="detected_province" name="detected_province" value="">
+
+                </form>
+            </div>
+
+
+            <!-- สรุปรายละเอียด -->
+            <div class="summary-right">
+                <div class="summary-card">
+                <h3>รายละเอียดบริการ</h3>
+                <div class="summary-row"><span>บริการ</span><span><%= booking.service_name %></span></div>
+                <div class="summary-row">
+                    <span>วันที่จอง</span>
+                    <span id="thai-date" data-date="<%= booking.booking_date %>"></span>
+                </div>
+
+                <div class="summary-row"><span>เวลา</span><span><%= booking.booking_time.slice(0, 5) %> น.</span></div>
+
+                <div class="summary-row">
+                    <span>ค่าบริการ</span>
+                    <span><%= booking.final_price.toLocaleString() %> บาท</span>
+                </div>
+                                
+                
+                
+                <div class="summary-row">
+                    <span>ระยะทาง</span>
+                    <span id="travel-distance"><%= Math.ceil(travel.distanceKm) %> กม.</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>ค่าบริการเดินทาง</span>
+                    <span id="travel-fee"><%= travel.fee.toLocaleString() %> บาท</span>
+                </div>
+
+                
+                <% 
+                    const totalFee = parseFloat(booking.final_price) + travel.fee; // ไม่ปัดค่า
+                    const deposit = totalFee * 0.2; // 20%
+                %>
+
+                <div class="summary-total">
+                    <span>รวมทั้งหมด</span>
+                    <span id="total-fee"><%= totalFee.toLocaleString() %> บาท</span>
+                </div>
+
+                <div class="summary-row" style="font-weight: bold; color: #1F3C88;">
+                    <span>ชำระตอนนี้ (20%)</span>
+                    <span><%= deposit.toLocaleString() %> บาท</span>
+                </div>
+
+                <div class="summary-btns">   
+                    <a href="/cancel-temp-booking/<%= booking.booking_id %>" class="btn-back_s">ย้อนกลับ</a>
+
+
+
+
+                    <form action="/payment/<%= booking.booking_id %>" method="POST">
+                        <input type="hidden" name="total_price" id="total-price-hidden" value="<%= totalFee %>">
+                        <button type="submit" class="btn-next_s">ยืนยัน</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+      
+    </main>
+<script> 
+// --- แปลง service_area เป็น array ---
+const allowedProvinces = ("<%= booking.service_area || '' %>")
+  .split(',')
+  .map(p => p.trim())
+  .filter(p => p.length > 0);
+
+let popupMap, popupMarker, popupAutocomplete;
+
+// --- ฟังก์ชันคำนวณระยะทางและค่าบริการ ---
+function updateTravel(origin, destination) {
+  if (!destination.lat || !destination.lng) return;
+
+  const distanceEl = document.getElementById('travel-distance');
+  const feeEl = document.getElementById('travel-fee');
+  const totalEl = document.getElementById('total-fee');
+  const totalHiddenEl = document.getElementById('total-price-hidden');
+
+  const serviceFee = parseFloat(<%= booking.final_price %>);
+
+  const service = new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix({
+    origins: [new google.maps.LatLng(origin.lat, origin.lng)],
+    destinations: [new google.maps.LatLng(destination.lat, destination.lng)],
+    travelMode: google.maps.TravelMode.DRIVING,
+  }, function(response, status) {
+    if (status !== 'OK') return console.error('DistanceMatrixService failed:', status);
+
+    const element = response.rows[0].elements[0];
+    if (element.status !== 'OK') return console.error('No route found:', element.status);
+
+    const distanceKm = element.distance.value / 1000;
+
+    let travelFee = 0;
+    if (distanceKm <= 10) travelFee = 0;
+    else if (distanceKm <= 20) travelFee = (distanceKm - 10) * 10;
+    else if (distanceKm <= 30) travelFee = 10*10 + (distanceKm - 20) * 12;
+    else travelFee = 10*10 + 10*12 + (distanceKm - 30) * 15;
+
+    if (distanceEl) distanceEl.innerText = distanceKm.toFixed(2) + " กม.";
+    if (feeEl) feeEl.innerText = travelFee.toLocaleString() + " บาท";
+
+    const totalFee = serviceFee + travelFee;
+    if (totalEl) totalEl.innerText = totalFee.toLocaleString() + " บาท";
+    if (totalHiddenEl) totalHiddenEl.value = totalFee;
+  });
+}
+
+// --- ฟังก์ชันตรวจจังหวัด ---
+async function detectProvince(lat, lng) {
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=th`);
+    const data = await res.json();
+
+    const province =
+      data.address?.city ||
+      data.address?.state ||
+      data.address?.province ||
+      data.address?.county ||
+      '';
+
+    document.getElementById('detected_province').value = province;
+    return province;
+  } catch (err) {
+    console.error('Reverse geocode error:', err);
+    return null;
+  }
+}
+
+// --- ฟังก์ชันเรียกตรวจจังหวัดตอน marker change ---
+async function handleMarkerChange(lat, lng) {
+  const province = await detectProvince(lat, lng);
+  if (!province) return false;
+
+  if (allowedProvinces.length > 0 && !allowedProvinces.includes(province)) {
+    alert(`พื้นที่นี้ไม่พบบริการ ${"<%= booking.service_name %>"}`);
+    return false; // ไม่อนุญาต
+  }
+
+  return true; // อนุญาต
+}
+
+// --- โหลดแผนที่ ---
+function initPopupMap() {
+  const lat = parseFloat(document.getElementById('latitude').value) || 13.736717;
+  const lng = parseFloat(document.getElementById('longitude').value) || 100.523186;
+
+  const origin = { lat: 13.70829764206614, lng: 100.36547567841797 };
+  let destination = { lat, lng };
+
+  popupMap = new google.maps.Map(document.getElementById('popup-map'), {
+    center: destination,
+    zoom: 17
+  });
+
+  popupMarker = new google.maps.Marker({
+    position: destination,
+    map: popupMap,
+    draggable: true
+  });
+
+  popupAutocomplete = new google.maps.places.Autocomplete(document.getElementById('popup-search'));
+  popupAutocomplete.addListener('place_changed', function() {
+    const place = popupAutocomplete.getPlace();
+    if (!place.geometry) return;
+
+    destination = {
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng()
+    };
+    popupMap.setCenter(destination);
+    popupMarker.setPosition(destination);
+    document.getElementById('latitude').value = destination.lat;
+    document.getElementById('longitude').value = destination.lng;
+
+    updateTravel(origin, destination);
+    handleMarkerChange(destination.lat, destination.lng);
+
+    const addressField = document.querySelector('textarea[name="address"]');
+    if (place.formatted_address) addressField.value = place.formatted_address;
+    else if (place.name) addressField.value = place.name;
+  });
+
+  popupMarker.addListener('dragend', function(event) {
+    destination = {
+      lat: event.latLng.lat(),
+      lng: event.latLng.lng()
+    };
+    document.getElementById('latitude').value = destination.lat;
+    document.getElementById('longitude').value = destination.lng;
+
+    updateTravel(origin, destination);
+    handleMarkerChange(destination.lat, destination.lng);
+  });
+
+  updateTravel(origin, destination);
+}
+
+// --- แปลงวันที่ไทย ---
+document.addEventListener("DOMContentLoaded", function () {
+  const dateElement = document.getElementById("thai-date");
+  const dateString = dateElement.dataset.date;
+
+  const months = [
+    "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+    "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+  ];
+
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear() + 543;
+
+  dateElement.textContent = `${day} ${month} ${year}`;
+});
+
+window.onload = initPopupMap;
+
+// --- ตอนกดบันทึก ---
+document.addEventListener('DOMContentLoaded', function () {
+  const saveBtn = document.querySelector('.btn-save');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const form = document.getElementById('update-address-form');
+
+      // ตรวจ required & validity
+      if (!form.checkValidity()) {
+        form.reportValidity(); // แสดงข้อความ error ของ browser
+        return;
+      }
+
+      const lat = parseFloat(document.getElementById('latitude').value);
+      const lng = parseFloat(document.getElementById('longitude').value);
+
+      if (!lat || !lng) {
+        alert('กรุณาปักหมุดตำแหน่งก่อน');
+        return;
+      }
+
+      // ตรวจพื้นที่อนุญาต
+      const allowed = await handleMarkerChange(lat, lng);
+      if (!allowed) return;
+
+      form.submit(); //  submit แบบถูกต้อง
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const paymentForm = document.querySelector('form[action^="/payment/"]');
+  if (paymentForm) {
+    paymentForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const addressForm = document.getElementById('update-address-form');
+
+      // ตรวจ validity ของฟอร์มที่อยู่
+      if (!addressForm.checkValidity()) {
+        addressForm.reportValidity(); // แสดงข้อความ error ของ browser
+        return; // หยุด submit
+      }
+      
+      const lat = parseFloat(document.getElementById('latitude').value);
+      const lng = parseFloat(document.getElementById('longitude').value);
+
+      if (!lat || !lng) {
+        alert('กรุณาปักหมุดตำแหน่งก่อน');
+        return;
+      }
+
+      const allowed = await handleMarkerChange(lat, lng);
+      if (!allowed) return; // หยุด submit ถ้าไม่อนุญาต
+
+      paymentForm.submit(); // submit ปกติ
+    });
+  }
+});
+
+</script>
+
+<script>
+  // เบอร์โทร
+function validatePhone(input) {
+  // ให้พิมพ์เฉพาะตัวเลข
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  if (input.value.length === 10) {
+    const phone = input.value;
+
+    // ต้องขึ้นต้นด้วย 06, 08, 09 เท่านั้น
+    const validPattern = /^0(6|8|9)\d{8}$/;
+
+    // ต้องไม่ใช่เลขซ้ำทั้ง 10 ตัว เช่น 0000000000
+    const notRepeated = !/^(\d)\1{9}$/.test(phone);
+
+    if (!validPattern.test(phone) || !notRepeated) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
+      input.value = "";
+    }
+  }
+}
+</script>
+
+
+
+</body>
+</html>

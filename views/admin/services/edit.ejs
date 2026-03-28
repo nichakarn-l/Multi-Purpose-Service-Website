@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>เพิ่มการบริการ</title>
+  <link rel="stylesheet" href="/styles/index_admin.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/admin/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+    <!--
+    <div class="right-section">
+      <i class="material-icons profile-icon">account_circle</i>
+    </div>
+    -->
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/admin/dashboard"><i class="material-icons">dashboard</i>หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'technicians' ? 'active' : '' %>">
+            <a href="/admin/technicians"><i class="material-icons">build</i>ระบบจัดการฐานข้อมูลช่าง</a>
+          </li>
+          <li class="<%= currentPage === 'users' ? 'active' : '' %>">
+            <a href="/admin/users"><i class="material-icons">people</i>ระบบจัดการฐานข้อมูลผู้ใช้</a>
+          </li>
+          <li class="<%= currentPage === 'service_categories' ? 'active' : '' %>">
+            <a href="/admin/service-categories"><i class="material-icons">category</i>จัดการหมวดหมู่บริการ</a>
+          </li>
+          <li class="<%= currentPage === 'services' ? 'active' : '' %>">
+            <a href="/admin/services"><i class="material-icons">miscellaneous_services</i>จัดการบริการ</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/admin/bookings"><i class="material-icons">event_note</i>ตรวจสอบการจอง</a>
+          </li>
+          <li class="<%= currentPage === 'payments' ? 'active' : '' %>">
+            <a href="/admin/payments"><i class="material-icons">payment</i>ตรวจสอบการชำระเงิน</a>
+          </li>
+          <li>
+            <a href="/admin/logout"><i class="material-icons">logout</i>ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+
+          <div class="page-header">
+            <h2>แก้ไขบริการ</h2>
+          </div>
+          
+          <form action="/admin/services/edit/<%= service.id %>" method="POST" enctype="multipart/form-data" class="technician-form">
+            <div class="technician-form-container">
+                <!-- รูป -->
+                <div class="technician-form-photo">
+                <label for="image" class="technician-form-photo-box_service" id="imageLabel"
+                    style="background-image: url('<%= service.image_path ? service.image_path : '' %>'); background-size: cover; background-position: center;">
+                    <% if (!service.image_path) { %>คลิกเพื่อเลือกรูปภาพ<% } %>
+                </label>
+                <input type="file" id="image" name="image" accept="image/*" hidden>
+                </div>
+
+                <div class="technician-form-fields">
+
+                <div class="technician-form-row">
+                    <div class="technician-form-group">
+                    <label for="service_category_id">หมวดหมู่บริการ</label>
+                    <select id="service_category_id" name="service_category_id" required>
+                        <option value="">-- เลือกหมวดหมู่ --</option>
+                        <% categories.forEach(cat => { %>
+                        <option value="<%= cat.id %>" <%= cat.id === service.service_category_id ? 'selected' : '' %>><%= cat.name %></option>
+                        <% }) %>
+                    </select>
+                    </div>
+                </div>
+
+                <div class="technician-form-row">
+                    <div class="technician-form-group">
+                    <label for="name">ชื่อบริการ</label>
+                    <input type="text" id="name" name="name" value="<%= service.name %>" required />
+                    </div>
+                </div>
+
+                <div class="technician-form-row">
+                    <div class="technician-form-group">
+                    <label for="description">รายละเอียดของบริการ</label>
+                    <textarea id="description" name="description" rows="4"><%= service.description || '' %></textarea>
+                    </div>
+                </div>
+
+                <h3>ราคาและระยะเวลา</h3>
+                <div class="technician-form-row">
+                    <div class="technician-form-group" id="duration-group">
+                    <label for="base_price">ราคาเริ่มต้น</label>
+                      <div>
+                        <input type="number" step="0.01" id="base_price" name="base_price" value="<%= service.base_price %>" required />
+                        <span>บาท/จุด</span>
+                      </div>
+                    </div>
+
+                    <div class="technician-form-group" id="duration-group">
+                    <label>ระยะเวลาการทำงาน</label>
+                    <div>
+                        <input type="number" id="hours" name="hours" min="0" value="<%= hours %>" placeholder="ชั่วโมง">
+                        <span>ชั่วโมง</span>
+
+                        <input type="number" id="minutes" name="minutes" min="0" max="59" value="<%= minutes %>" placeholder="นาที">
+                        <span>นาที</span>
+                    </div>
+                    </div>
+                </div>
+
+                <h3>รายละเอียดเพิ่มเติม</h3>
+
+                  <!-- รายละเอียดการบริการ -->
+                  <div class="technician-form-row">
+                    <div class="technician-form-group">
+                      <label for="service_details">รายละเอียดการบริการ</label>
+                      <textarea id="service_details" name="service_details" rows="4" placeholder="รายละเอียดการบริการ"><%= service.service_details || '' %></textarea>
+
+                    </div>
+                  </div>
+
+                  <!-- พื้นที่บริการ -->
+                  <div class="technician-form-row">
+                    <div class="technician-form-group">
+                      <label for="service_area">พื้นที่บริการ</label>
+                      <input 
+                        type="text" 
+                        id="service_area" 
+                        name="service_area" 
+                        placeholder="พื้นที่บริการ"  
+                        value="<%= service.service_area || '' %>" 
+                        required 
+                      />
+                    </div>
+                  </div>
+
+                  <!-- ขั้นตอนการทำงาน -->
+                  <div class="technician-form-row">
+                    <div class="technician-form-group">
+                      <label for="workflow">ขั้นตอนการทำงาน</label>
+                      <textarea id="workflow" name="workflow" rows="4" placeholder="ขั้นตอนการทำงาน"><%= service.workflow || '' %></textarea>
+                      
+                    </div>
+                  </div>
+
+                  <!-- เงื่อนไขการรับประกัน -->
+                  <div class="technician-form-row">
+                    <div class="technician-form-group">
+                      <label for="warranty_conditions">เงื่อนไขการรับประกัน</label>
+                      <textarea id="warranty_conditions" name="warranty_conditions" rows="4" placeholder="เงื่อนไขการรับประกัน"><%= service.warranty_conditions || '' %></textarea>
+                    </div>
+                  </div>
+
+                                  
+                <!--
+                <h3>ตัวเลือกเสริม</h3>
+                <div class="technician-form-row">
+                  <div class="technician-form-group">
+                    <% if (options.length > 0) { %>
+                    <% options.forEach(opt => { %>
+                        <div id="option-group">
+                        <input type="text" name="option_name[]" value="<%= opt.option_name %>">
+                        <input type="number" step="0.01" name="option_price[]" value="<%= opt.option_price %>">
+                        
+                          <button type="button" onclick="removeOption(this)">ลบ</button>
+                        
+                        
+                        </div>
+                    <% }) %>
+                    <% } else { %>
+                    <div id="option-group">
+                        <input type="text" name="option_name[]" placeholder="ชื่อ option เช่น การติดตั้ง ปลั๊กไฟ" />
+                        <input type="number" step="0.01" name="option_price[]" placeholder="ราคา (บาท)" />
+                        
+                          <button type="button" onclick="removeOption(this)">ลบ</button>
+                        
+                       
+                    </div>
+                    <% } %>
+                  </div>
+                  
+                    <button type="button" onclick="addOption()">เพิ่มตัวเลือก</button>
+                 
+
+                </div>
+              -->
+                
+                    
+                    
+                
+
+                </div>
+                <button type="submit" class="technician-btn-submit submit-right">บันทึก</button>
+            </div>
+            </form>  
+        </div>
+      </div>
+    </main>
+    </div>
+   <script>
+        const fileInput = document.getElementById('image');
+        const imageLabel = document.getElementById('imageLabel');
+
+        // แสดง preview รูปเมื่อเลือกใหม่
+        fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+            imageLabel.style.backgroundImage = `url(${e.target.result})`;
+            imageLabel.textContent = '';
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+        });
+
+        // จัดการตัวเลือกเสริม
+        function addOption() {
+        const container = document.getElementById('options-container');
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.innerHTML = `
+            <input type="text" name="option_name[]" placeholder="ชื่อ option เช่น การติดตั้ง ปลั๊กไฟ" />
+            <input type="number" step="0.01" name="option_price[]" placeholder="ราคา (บาท)" />
+            <button type="button" onclick="removeOption(this)">ลบ</button>
+        `;
+        container.appendChild(div);
+        }
+
+        function removeOption(btn) {
+        btn.parentElement.remove();
+        }
+    </script>
+
+</body>
+</html>

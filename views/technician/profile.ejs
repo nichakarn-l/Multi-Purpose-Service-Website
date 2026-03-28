@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แก้ไขข้อมูล</title>
+  <link rel="stylesheet" href="/styles/index_technician.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <header class="top-navbar">
+    <div class="left-section">
+      <span class="material-icons menu-icon">menu</span>
+      <a href="/technician/dashboard" class="logo">
+        <img src="/images/logo.png" alt="HandyX Logo" class="logo-img">
+      </a>
+    </div>
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+            <a href="/technician/dashboard"><i class="material-icons">home</i> หน้าหลัก</a>
+          </li>
+          <li class="<%= currentPage === 'calendar' ? 'active' : '' %>">
+            <a href="/technician/calendar"><i class="material-icons">calendar_today</i> ตารางงาน</a>
+          </li>
+          <li class="<%= currentPage === 'bookings' ? 'active' : '' %>">
+            <a href="/technician/bookings"><i class="material-icons">assignment</i> รายการงาน</a>
+          </li>
+          <li class="<%= currentPage === 'completed' ? 'active' : '' %>">
+            <a href="/technician/completed"><i class="material-icons">check_circle</i> งานที่สำเร็จแล้ว</a>
+          </li>
+          <li class="<%= currentPage === 'profile' ? 'active' : '' %>">
+            <a href="/technician/profile"><i class="material-icons">account_circle</i> แก้ไขข้อมูล</a>
+        </li>
+
+          <li>
+            <a href="/technician/logout"><i class="material-icons">logout</i> ออกจากระบบ</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="content">
+        <div class="list-card">
+          <div class="page-header">
+            <h1>แก้ไขข้อมูล</h1>
+          </div>
+
+          <form action="/technician/profile/edit" method="POST" class="technician-form" enctype="multipart/form-data">
+            <div class="technician-form-container">
+                <!-- รูป -->
+            <div class="technician-form-photo">
+              <label for="photoInput" class="technician-form-photo-box" id="photoPreview"
+                style="background-image: url('<%= technician.photo || "" %>'); background-size: cover; background-position: center;">
+                <%= technician.photo ? '' : 'คลิกเพื่อเลือกรูป' %>
+              </label>
+              <input type="file" id="photoInput" name="photo" accept="image/*" hidden>
+              <input type="hidden" name="old_photo" value="<%= technician.photo %>">
+            </div>
+
+
+            <!-- ข้อมูลส่วนตัว -->
+            <div class="technician-form-fields">
+
+              <div class="technician-form-row">
+                <div class="technician-form-group">
+                  <label>คำนำหน้า</label>
+                  <select name="prefix" disabled>
+                    <option value="">-- เลือกคำนำหน้า --</option>
+                    <option value="นาย" <%= technician.prefix==='นาย'?'selected':'' %>>นาย</option>
+                    <option value="นาง" <%= technician.prefix==='นาง'?'selected':'' %>>นาง</option>
+                    <option value="นางสาว" <%= technician.prefix==='นางสาว'?'selected':'' %>>นางสาว</option>
+                  </select>
+                  <input type="hidden" name="prefix" value="<%= technician.prefix %>">
+                </div>
+              </div>
+
+              <div class="technician-form-row">
+                <div class="technician-form-group">
+                  <label>ชื่อ</label>
+                  <input type="text" name="first_name" value="<%= technician.first_name %>" required>
+                </div>
+                <div class="technician-form-group">
+                  <label>นามสกุล</label>
+                  <input type="text" name="last_name" value="<%= technician.last_name %>" required>
+                </div>
+              </div>
+
+              <div class="technician-form-row">
+              
+                <div class="technician-form-group">
+                  <label>วัน-เดือน-ปีเกิด</label>
+                  <%
+                    let displayBirth = '';
+                    let hiddenBirth = '';
+                    if (technician.birth_date) {
+                      const d = new Date(technician.birth_date);
+                      const day = String(d.getDate()).padStart(2, '0');
+                      const month = d.toLocaleString('th-TH', { month: 'long' });
+                      const yearBE = d.getFullYear() + 543;
+                      displayBirth = `${day} ${month} ${yearBE}`;
+
+                      const yyyy = d.getFullYear();
+                      const mm = String(d.getMonth() + 1).padStart(2, '0');
+                      const dd = String(d.getDate()).padStart(2, '0');
+                      hiddenBirth = `${yyyy}-${mm}-${dd}`;
+                    }
+                  %>
+
+                  <input type="text" value="<%= displayBirth %>" disabled style="width:31%;">
+                  <input type="hidden" name="birth_date" value="<%= hiddenBirth %>">
+
+                </div>
+              </div>
+
+
+
+              <div class="technician-form-row">
+                <div class="technician-form-group">
+                  <label>เบอร์โทร</label>
+                  <input type="text" name="phone" value="<%= technician.phone %>" maxlength="10" oninput="validatePhone(this)">
+                </div>
+                <div class="technician-form-group">
+                  <label>อีเมล</label>
+                  <input type="email" name="email" value="<%= technician.user_email %>" readonly>
+                </div>
+              </div>
+
+              <div class="technician-form-row">
+                <div class="technician-form-group">
+                  <label>ที่อยู่</label>
+                  <textarea name="address"><%= technician.address %></textarea>
+                </div>
+              </div>
+
+            </div>
+            
+           <button type="submit" class="technician-btn-submit submit-right">บันทึกการแก้ไข</button>
+
+            </div>
+             
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Flatpickr JS -->
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+<script>
+  const birthHidden = document.getElementById('birth_date_iso');
+
+  // แปลงค่า hidden (YYYY-MM-DD) → Date
+  let defaultDate = null;
+  if (birthHidden.value) {
+    const [yyyy, mm, dd] = birthHidden.value.split('-');
+    defaultDate = new Date(+yyyy, +mm - 1, +dd);
+  }
+
+  function formatBuddhist(date, fp) {
+    const day = date.getDate();
+    const month = fp.l10n.months.longhand[date.getMonth()];
+    const year = date.getFullYear() + 543;
+    return `${day} ${month} ${year}`;
+  }
+
+  function syncHidden(date) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    birthHidden.value = `${yyyy}-${mm}-${dd}`;
+  }
+
+  flatpickr("#birth_date", {
+    locale: "th",
+    maxDate: "today",
+    defaultDate: defaultDate,
+
+    onReady(selectedDates, _, fp) {
+      if (selectedDates.length) {
+        fp.input.value = formatBuddhist(selectedDates[0], fp);
+        syncHidden(selectedDates[0]);
+      }
+    },
+
+    onChange(selectedDates, _, fp) {
+      if (selectedDates.length) {
+        fp.input.value = formatBuddhist(selectedDates[0], fp);
+        syncHidden(selectedDates[0]);
+      }
+    }
+  });
+</script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // รูป preview
+      const photoInput = document.getElementById('photoInput');
+      const photoPreview = document.getElementById('photoPreview');
+
+      photoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            photoPreview.style.backgroundImage = `url(${e.target.result})`;
+            photoPreview.textContent = '';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+    });
+  </script>
+
+  <script>
+  // เบอร์โทร
+function validatePhone(input) {
+  // ให้พิมพ์เฉพาะตัวเลข
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  if (input.value.length === 10) {
+    const phone = input.value;
+
+    // ต้องขึ้นต้นด้วย 06, 08, 09 เท่านั้น
+    const validPattern = /^0(6|8|9)\d{8}$/;
+
+    // ต้องไม่ใช่เลขซ้ำทั้ง 10 ตัว เช่น 0000000000
+    const notRepeated = !/^(\d)\1{9}$/.test(phone);
+
+    if (!validPattern.test(phone) || !notRepeated) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
+      input.value = "";
+    }
+  }
+}
+
+</script>
+</body>
+</html>
